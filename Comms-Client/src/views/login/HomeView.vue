@@ -2,9 +2,9 @@
 </script>
 
 <template>
-	<main>
-		<RouterView />
-	</main>
+	<div class="greetings">
+		<h1 class="green">THIS IS THE LOGIN PAGE</h1>
+	</div>
 </template>
 
 <style scoped>

@@ -2,9 +2,14 @@
 </script>
 
 <template>
-	<main>
-		<RouterView />
-	</main>
+	<nav>
+		<RouterLink to='/'>Go to Home</RouterLink>
+		<RouterLink to='/login'>Go to Login</RouterLink>
+	</nav>
+
+	<div class="greetings">
+		<h1 class="green">THIS IS THE HOME PAGE</h1>
+	</div>
 </template>
 
 <style scoped>
