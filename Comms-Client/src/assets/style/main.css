@@ -1,0 +1,10 @@
+@tailwind utilities;
+
+/* Project custom styles and tokens */
+:root{
+	--brand-green: #10b981;
+}
+
+.h1-brand {
+	color: var(--brand-green);
+}
