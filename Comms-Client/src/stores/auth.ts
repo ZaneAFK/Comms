@@ -5,7 +5,8 @@ import { ref, computed } from 'vue'
 export const useAuthStore = defineStore('auth', () => {
 	const user = ref<User | null>(null)
 	const token = ref<string | null>(null)
-	const isAuthenticated = computed(() => !!token.value)
+	// enableAuth IS DEV ONLY, REMOVE FLAG FOR PRODUCTION
+	const isAuthenticated = computed(() => !!token.value || (import.meta.env.DEV && localStorage.getItem('enableAuth') === 'true'))
 
 	// Initialize from localStorage
 	const storedUser = localStorage.getItem('user')
