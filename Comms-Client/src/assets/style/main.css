@@ -85,3 +85,18 @@ p, label { color: var(--muted); }
 	width: 25%;
 }
 
+.tool-bar {
+	position: sticky;
+	top: 0;
+	z-index: 50;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 0.75rem 1.25rem;
+	background: rgba(255,255,255,0.75);
+	backdrop-filter: blur(6px);
+	border-bottom: 1px solid rgba(15,23,42,0.06);
+	box-shadow: 0 6px 18px rgba(var(--brand-blue-r),0.04);
+}
+
