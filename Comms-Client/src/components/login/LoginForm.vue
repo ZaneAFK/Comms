@@ -29,11 +29,15 @@
 	</div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 	import { ref } from 'vue';
 	const email = ref('')
 	const password = ref('')
 	const show = ref(false)
 	const loading = ref(false)
 	const error = ref('')
+
+	async function submit() {
+		console.log('Attempted login with', email.value, password.value);
+	}
 </script>
