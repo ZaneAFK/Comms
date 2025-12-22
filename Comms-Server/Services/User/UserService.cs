@@ -3,7 +3,7 @@ using Comms_Server.Database.Models.User;
 
 namespace Comms_Server.Services.User
 {
-	public class UserService : Service
+	public class UserService : Service, IUserService
 	{
 		public UserService(IFactory factory) : base(factory)
 		{

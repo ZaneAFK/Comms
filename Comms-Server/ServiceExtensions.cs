@@ -2,6 +2,7 @@
 using Comms_Server.Database.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Comms_Server.Services.User;
+using Comms_Server.Services.Authentication;
 
 namespace Comms_Server
 {
@@ -20,8 +21,8 @@ namespace Comms_Server
 		{
 			services.AddScoped<IFactory, Factory>();
 
-			// REGISTER EACH SERVICE CLASS THAT IS INJECTED WITH FACTORY HERE
-			services.AddScoped<UserService>();
+			services.AddScoped<IUserService, UserService>();
+			services.AddScoped<IAuthenticationService, AuthenticationService>();
 
 			return services;
 		}
