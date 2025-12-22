@@ -1,8 +1,8 @@
 ﻿using Comms_Server.Database;
 using Comms_Server.Database.DbContext;
-using Microsoft.EntityFrameworkCore;
-using Comms_Server.Services.User;
 using Comms_Server.Services.Authentication;
+using Comms_Server.Services.User;
+using Microsoft.EntityFrameworkCore;
 
 namespace Comms_Server
 {
