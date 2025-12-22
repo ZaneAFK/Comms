@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Comms_Server.Database.DbContext;
+using Comms_Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<CommsDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddCommsDb(builder.Configuration.GetConnectionString("DefaultConnection"));
+
+builder.Services.AddCommsServices();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
