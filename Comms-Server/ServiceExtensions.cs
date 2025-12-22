@@ -7,7 +7,7 @@ namespace Comms_Server
 {
 	public static class ServiceExtensions
 	{
-		public static IServiceCollection AddCommsDb(this IServiceCollection services, string connectionString)
+		public static IServiceCollection AddCommsDb(this IServiceCollection services, string? connectionString)
 		{
 			services.AddDbContext<CommsDbContext>(options =>
 				options.UseNpgsql(connectionString)
