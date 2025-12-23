@@ -29,7 +29,7 @@ jobs:
 
       # Step 4: Build solution
       - name: Build
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build Comms-Server/Comms-Server.sln --no-restore --configuration Release
 
       # Step 5: Run code style check
       - name: Verify code style
