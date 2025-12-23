@@ -25,19 +25,23 @@ jobs:
 
       # Step 3: Restore NuGet packages
       - name: Restore packages
-        run: dotnet restore Comms-Server/Comms-Server.sln
+        run: dotnet restore
+        working-directory: Comms-Server
 
       # Step 4: Build solution
       - name: Build
-        run: dotnet build Comms-Server/Comms-Server.sln --no-restore --configuration Release
+        run: dotnet build --no-restore --configuration Release
+        working-directory: Comms-Server
 
       # Step 5: Run code style check
       - name: Verify code style
         run: dotnet format --verify-no-changes
+        working-directory: Comms-Server
 
       # Step 6: Run tests
       - name: Run tests
-        run: dotnet test Comms-Server/Comms-Server.Testing/Comms-Server.Testing.csproj --no-build --configuration Release --logger "trx;LogFileName=test_results.trx"
+        run: dotnet test --no-build --configuration Release --logger "trx;LogFileName=test_results.trx"
+        working-directory: Comms-Server
 
       # Step 7: Upload test results
       - name: Upload test results
