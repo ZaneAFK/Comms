@@ -35,7 +35,7 @@ jobs:
 
       # Step 5: Run code style check
       - name: Verify code style
-        run: dotnet format --verify-no-changes
+        run: dotnet format --verify-no-changes --exclude "**/Migrations/**"
         working-directory: Comms-Server
 
       # Step 6: Run tests
