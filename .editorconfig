@@ -4,6 +4,8 @@ root = true
 # C# files
 [*.cs]
 
+dotnet_diagnostic.IDE0005.severity = error # Unused using directives
+
 #### Core EditorConfig Options ####
 
 # Indentation and spacing
@@ -13,7 +15,7 @@ tab_width = 4
 
 # New line preferences
 end_of_line = crlf
-insert_final_newline = false
+insert_final_newline = true
 
 #### .NET Code Actions ####
 
@@ -282,10 +284,8 @@ dotnet_style_qualification_for_property = false:silent
 dotnet_style_qualification_for_method = false:silent
 dotnet_style_qualification_for_event = false:silent
 
-#### Custom Settings for Comms Project ####
-
-# Remove unused using directives
-dotnet_diagnostic.IDE0005.severity = error
-# Exclude auto generated migration files
+# Exclude auto generated files from certain rules
 [**/Migrations/*.cs]
-dotnet_diagnostic.IDE0005.severity = none
+
+dotnet_diagnostic.IDE0005.severity = none # Unused using directives
+dotnet_diagnostic.IDE0055.severity = none # FINALNEWLINE
