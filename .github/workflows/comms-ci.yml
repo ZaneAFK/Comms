@@ -31,14 +31,14 @@ jobs:
 
         - name: Run frontend tests
           working-directory: Comms-Client
-          run: npm test
+          run: npm test-ci
 
         - name: Upload test results
           if: always()
           uses: actions/upload-artifact@v4
           with:
             name: frontend-test-results
-            path: "**/TestResults/*.xml"
+            path: "test-results/frontend-test-results.xml"
 
 
 
@@ -76,4 +76,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backend-test-results
-          path: "**/TestResults/*.trx"
+          path: "TestResults/backend-test-results.trx"
