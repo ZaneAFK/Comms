@@ -1,6 +1,5 @@
 name: Comms CI
 
-# Trigger on pull requests to master and any push
 on:
   pull_request:
     branches: [master]
@@ -9,42 +8,72 @@ on:
       - synchronize
 
 jobs:
-  build-and-test:
-    runs-on: windows-latest
+  frontend:
+    name: Frontend CI
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
     steps:
-      # Step 1: Checkout the repo
+        - name: Checkout repository
+          uses: actions/checkout@v3
+
+        - name: Setup Node.js
+          uses: actions/setup-node@v3
+          with:
+            node-version: '20'
+
+        - name: Install dependencies
+          working-directory: Comms-Client
+          run: npm ci
+        
+        - name: Build
+          working-directory: Comms-Client
+          run: npm run build
+
+        - name: Run frontend tests
+          working-directory: Comms-Client
+          run: npm run test-ci
+
+        - name: Upload test results
+          if: always()
+          uses: actions/upload-artifact@v4
+          with:
+            name: frontend-test-results
+            path: "**/test-results/frontend-test-results.xml"
+
+
+
+  backend:
+    name: Backend CI
+    runs-on: windows-latest
+    if: github.event.pull_request.draft == false
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Setup .NET 8
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 8.0.x
 
-      # Step 3: Restore NuGet packages
       - name: Restore packages
         run: dotnet restore
         working-directory: Comms-Server
 
-      # Step 4: Build solution
       - name: Build
         run: dotnet build --no-restore --configuration Release
         working-directory: Comms-Server
 
-      # Step 5: Run code style check
       - name: Verify code style
         run: dotnet format --verify-no-changes --exclude "**/Migrations/**"
         working-directory: Comms-Server
 
-      # Step 6: Run tests
-      - name: Run tests
-        run: dotnet test --no-build --configuration Release --logger "trx;LogFileName=test_results.trx"
+      - name: Run backend tests
+        run: dotnet test --no-build --configuration Release --logger "trx;LogFileName=backend-test-results.trx"
         working-directory: Comms-Server
 
-      # Step 7: Upload test results
       - name: Upload test results
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
-          path: "**/TestResults/*.trx"
+          name: backend-test-results
+          path: "**/TestResults/backend-test-results.trx"
