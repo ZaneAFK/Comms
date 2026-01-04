@@ -9,6 +9,7 @@ General guide to start development.
 ## Frontend
 1. Install and setup ***Visual Studio Code IDE*** with the following extensions
    - Vue (Official)
+   - Vitest
    - Tailwind CSS IntelliSense
    - Pretty TypeScript Errors
    - ESLint
