@@ -23,6 +23,10 @@ jobs:
         - name: Install dependencies
           working-directory: Comms-Client
           run: npm ci
+        
+        - name: Build
+          working-directory: Comms-Client
+          run: npm run build
 
         - name: Run frontend tests
           working-directory: Comms-Client
