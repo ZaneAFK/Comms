@@ -38,7 +38,7 @@ jobs:
           uses: actions/upload-artifact@v4
           with:
             name: frontend-test-results
-            path: "test-results/frontend-test-results.xml"
+            path: "**/test-results/frontend-test-results.xml"
 
 
 
@@ -68,7 +68,7 @@ jobs:
         working-directory: Comms-Server
 
       - name: Run backend tests
-        run: dotnet test --no-build --configuration Release --logger "trx;LogFileName=test_results.trx"
+        run: dotnet test --no-build --configuration Release --logger "trx;LogFileName=backend-test-results.trx"
         working-directory: Comms-Server
 
       - name: Upload test results
@@ -76,4 +76,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backend-test-results
-          path: "TestResults/backend-test-results.trx"
+          path: "**/TestResults/backend-test-results.trx"
