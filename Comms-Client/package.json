@@ -13,6 +13,7 @@
 		"build-only": "vite build",
 		"type-check": "vue-tsc --build",
 		"test": "vitest",
+		"test-ci": "vitest run --reporter=junit --outputFile=test-results/frontend-test-results.xml",
 		"lint": "eslint . --fix --cache",
 		"lint:style": "stylelint \"**/*.{css,vue}\" --fix"
 	},
