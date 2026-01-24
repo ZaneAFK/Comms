@@ -29,7 +29,7 @@ namespace Comms_Server
 		{
 			services.AddScoped<IFactory, Factory>();
 
-			services.AddScoped<IUserService, UserService>();
+			services.AddScoped<IDomainUserService, DomainUserService>();
 
 			services.AddIdentity<SecurityUser, IdentityRole<Guid>>()
 				.AddEntityFrameworkStores<CommsDbContext>()

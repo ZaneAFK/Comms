@@ -5,6 +5,6 @@ namespace Comms_Server.Services.Authentication
 {
 	public interface IAuthManager
 	{
-		Task<IdentityResult> CreateAsync(SecurityUser user, string password);
+		Task<IdentityResult> RegisterSecurityUser(SecurityUser user, string password);
 	}
 }
