@@ -3,6 +3,12 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Load development env variables
+if (builder.Environment.IsDevelopment())
+{
+	DotNetEnv.Env.Load("../../.env.development");
+}
+
 builder.Services.AddCommsDb(builder.Configuration.GetConnectionString("DefaultConnection"));
 
 builder.Services.AddCommsServices();
