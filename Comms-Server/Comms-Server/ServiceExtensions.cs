@@ -8,8 +8,14 @@ namespace Comms_Server
 {
 	public static class ServiceExtensions
 	{
-		public static IServiceCollection AddCommsDb(this IServiceCollection services, string? connectionString)
+		public static IServiceCollection AttachCommsDatabase(this IServiceCollection services)
 		{
+			var connectionString =
+				$"Host={Environment.GetEnvironmentVariable("DATABASE_HOST")};" +
+				$"Database={Environment.GetEnvironmentVariable("DATABASE_NAME")};" +
+				$"Username={Environment.GetEnvironmentVariable("DATABASE_USER")};" +
+				$"Password={Environment.GetEnvironmentVariable("DATABASE_PASSWORD")};";
+
 			services.AddDbContext<CommsDbContext>(options =>
 				options.UseNpgsql(connectionString)
 			);
