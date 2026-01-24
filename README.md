@@ -28,7 +28,7 @@ GitHub Actions is used for CI to ensure code quality and integrity. Below is the
 ## Backend + Database
 1. Install and setup ***Visual Studio IDE***
 2. Install ***docker*** for running Postgres database
-3. Create a `.env.development` file based on `.env.template` and fill in the relevant variables
+3. Create a `.env` file based on `.env.template` and fill in the relevant variables
 4. Start the Postgres database using Docker Compose:
    - `docker compose up -d`
 5. Any changes that update the database schema, run migrations locally with:
