@@ -1,7 +1,9 @@
 ﻿using Comms_Server.Database;
 using Comms_Server.Database.DbContext;
+using Comms_Server.Database.Models.User;
 using Comms_Server.Services.Authentication;
 using Comms_Server.Services.User;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Comms_Server
@@ -28,6 +30,11 @@ namespace Comms_Server
 			services.AddScoped<IFactory, Factory>();
 
 			services.AddScoped<IUserService, UserService>();
+
+			services.AddIdentity<SecurityUser, IdentityRole<Guid>>()
+				.AddEntityFrameworkStores<CommsDbContext>()
+				.AddDefaultTokenProviders();
+			services.AddScoped<IAuthManager, AuthManager>();
 			services.AddScoped<IAuthenticationService, AuthenticationService>();
 
 			return services;

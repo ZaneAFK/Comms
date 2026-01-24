@@ -4,8 +4,11 @@ namespace Comms_Server.Services.Authentication
 {
 	public class AuthenticationService : Service, IAuthenticationService
 	{
-		public AuthenticationService(IFactory factory) : base(factory)
+		private readonly IAuthManager _authManager;
+
+		public AuthenticationService(IFactory factory, IAuthManager authManager) : base(factory)
 		{
+			_authManager = authManager;
 		}
 	}
 }
