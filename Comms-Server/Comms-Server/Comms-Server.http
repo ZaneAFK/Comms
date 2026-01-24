@@ -1,6 +1,0 @@
-@Comms_Server_HostAddress = http://localhost:5177
-
-GET {{Comms_Server_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
