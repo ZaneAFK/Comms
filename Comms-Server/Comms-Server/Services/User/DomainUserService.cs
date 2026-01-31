@@ -9,14 +9,21 @@ namespace Comms_Server.Services.User
 		{
 		}
 
-		public async Task<DomainUser?> GetUserAsync(Guid id)
+		public async Task<DomainUser?> CreateDomainUserForSecurityUserAsync(SecurityUser securityUser)
 		{
-			return await Factory.GetAsync<DomainUser>(id);
-		}
+			var domainUserExists = await Factory.ExistsAsync<DomainUser>(u => u.SecurityUserId == securityUser.Id);
+			if (domainUserExists)
+			{
+				return null;
+			}
 
-		public async Task AddUserAsync(DomainUser user)
-		{
-			await Factory.AddAsync(user);
+			var domainUser = Factory.New<DomainUser>();
+			domainUser.SecurityUserId = securityUser.Id;
+			domainUser.Username = securityUser.UserName ?? "";
+
+			await Factory.SaveAsync();
+
+			return domainUser;
 		}
 	}
 }

@@ -1,4 +1,5 @@
 using Comms_Server;
+using Comms_Server.Database;
 using Comms_Server.Database.DbContext;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +12,6 @@ if (builder.Environment.IsDevelopment())
 }
 
 builder.Services.AttachCommsDatabase();
-
 builder.Services.AddCommsServices();
 
 // Add services to the container.
@@ -25,8 +25,14 @@ var app = builder.Build();
 // Apply any pending database migrations on start up
 using (var scope = app.Services.CreateScope())
 {
+	var serviceProvider = scope.ServiceProvider;
+
+	// Apply pending migrations
 	var db = scope.ServiceProvider.GetRequiredService<CommsDbContext>();
 	db.Database.Migrate();
+
+	// Seed roles
+	await Database.SeedRolesAsync(serviceProvider);
 }
 
 // Configure the HTTP request pipeline.

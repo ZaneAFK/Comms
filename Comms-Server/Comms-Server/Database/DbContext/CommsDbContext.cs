@@ -23,6 +23,10 @@ namespace Comms_Server.Database.DbContext
 				.WithOne()
 				.HasForeignKey<DomainUser>(u => u.SecurityUserId)
 				.IsRequired();
+
+			modelBuilder.Entity<DomainUser>()
+				.HasIndex(u => u.SecurityUserId)
+				.IsUnique();
 		}
 	}
 }

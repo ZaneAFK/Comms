@@ -12,19 +12,16 @@ namespace Comms_Server.Services.Authentication
 			_userManager = userManager;
 		}
 
-		public async Task<IdentityResult> RegisterSecurityUser(SecurityUser user, string password)
+		public async Task<IdentityResult> RegisterSecurityUserAsync(SecurityUser securityUser, string password)
 		{
-			try
-			{
-				var securityUser = await _userManager.CreateAsync(user, password);
-				await _userManager.AddToRolesAsync(user, new List<string> { "User" });
+			var result = await _userManager.CreateAsync(securityUser, password);
 
-				return securityUser;
-			}
-			catch (Exception ex)
+			if (result.Succeeded)
 			{
-				throw new Exception($"Error registering user: {ex.Message}");
+				await _userManager.AddToRolesAsync(securityUser, new List<string> { "User" });
 			}
+
+			return result;
 		}
 	}
 }

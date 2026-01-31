@@ -1,4 +1,5 @@
-﻿using Comms_Server.Database.DbContext;
+﻿using System.Linq.Expressions;
+using Comms_Server.Database.DbContext;
 using Microsoft.EntityFrameworkCore;
 
 namespace Comms_Server.Database
@@ -27,21 +28,43 @@ namespace Comms_Server.Database
 		/// Retrieve all entities of the given type.
 		/// </summary>
 		/// <typeparam name="T">Entity type.</typeparam>
-		/// <returns>All entities of type T.</returns>
+		/// <returns>All entities of type <typeparamref name="T"/>.</returns>
 		public async Task<IEnumerable<T>> GetAllAsync<T>() where T : class
 		{
 			return await _context.Set<T>().ToListAsync();
 		}
 
 		/// <summary>
-		/// Add a new entity and persist immediately.
+		/// Determines whether any entity of type <typeparamref name="T"/> exists in the database
+		/// that satisfies the specified predicate.
+		/// </summary>
+		/// <typeparam name="T">Entity type.</typeparam>
+		public async Task<bool> ExistsAsync<T>(Expression<Func<T, bool>> predicate) where T : class
+		{
+			return await _context.Set<T>().AnyAsync(predicate);
+		}
+
+		/// <summary>
+		/// Add a new entity and track it (does NOT call SaveChanges).
 		/// </summary>
 		/// <typeparam name="T">Entity type.</typeparam>
 		/// <param name="entity">Entity to add.</param>
 		public async Task AddAsync<T>(T entity) where T : class
 		{
 			await _context.Set<T>().AddAsync(entity);
-			await _context.SaveChangesAsync();
+		}
+
+		/// <summary>
+		/// Create a new instance of <typeparamref name="T"/> using a public parameterless constructor,
+		/// attach it to the change tracker and return it (does NOT call SaveChanges).
+		/// </summary>
+		/// <typeparam name="T">Entity type.</typeparam>
+		/// <returns>Tracked entity.</returns>
+		public T New<T>() where T : class, new()
+		{
+			var entity = new T();
+			_context.Set<T>().Add(entity);
+			return entity;
 		}
 
 		/// <summary>
@@ -69,7 +92,7 @@ namespace Comms_Server.Database
 		/// <summary>
 		/// Persist any pending changes tracked by the DbContext.
 		/// </summary>
-		public async Task Save()
+		public async Task SaveAsync()
 		{
 			await _context.SaveChangesAsync();
 		}
