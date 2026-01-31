@@ -11,6 +11,11 @@ namespace Comms_Server.Services.User
 
 		public async Task<DomainUser?> CreateDomainUserForSecurityUserAsync(SecurityUser securityUser)
 		{
+			if (securityUser == null)
+			{
+				return null;
+			}
+
 			var domainUserExists = await Factory.ExistsAsync<DomainUser>(u => u.SecurityUserId == securityUser.Id);
 			if (domainUserExists)
 			{

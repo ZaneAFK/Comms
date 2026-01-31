@@ -14,6 +14,11 @@ namespace Comms_Server.Services.Authentication
 
 		public async Task<IdentityResult> RegisterSecurityUserAsync(SecurityUser securityUser, string password)
 		{
+			if (securityUser == null || string.IsNullOrEmpty(password))
+			{
+				return IdentityResult.Failed(new IdentityError { Description = "Null or empty SecurityUser or password." });
+			}
+
 			var result = await _userManager.CreateAsync(securityUser, password);
 
 			if (result.Succeeded)

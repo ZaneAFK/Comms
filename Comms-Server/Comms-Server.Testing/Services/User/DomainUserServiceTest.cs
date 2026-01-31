@@ -8,13 +8,13 @@ namespace Comms_Server.Testing.Services.User
 	[TestFixture]
 	public class DomainUserServiceTest : TransactionalTest
 	{
-		private DomainUserService domainUserService;
+		public required DomainUserService DomainUserService;
 
 		public override async Task Setup()
 		{
 			await base.Setup();
 
-			domainUserService = new DomainUserService(Factory);
+			DomainUserService = new DomainUserService(Factory);
 		}
 
 		[Test]
@@ -22,10 +22,10 @@ namespace Comms_Server.Testing.Services.User
 		{
 			// Arrange
 			var result = await AuthenticationService.RegisterSecurityUserAsync("testuser", "test@gmail.com", "testpassword");
-			Assert.IsNotNull(result.SecurityUser);
+			var securityUser = result.SecurityUser ?? throw new AssertionException("SecurityUser should not be null");
 
 			// Act
-			var domainUser = await domainUserService.CreateDomainUserForSecurityUserAsync(result.SecurityUser);
+			var domainUser = await DomainUserService.CreateDomainUserForSecurityUserAsync(securityUser) ?? throw new AssertionException("DomainUser should not be null");
 
 			// Assert
 			Assert.IsNotNull(domainUser);
@@ -37,12 +37,12 @@ namespace Comms_Server.Testing.Services.User
 		{
 			// Arrange
 			var result = await AuthenticationService.RegisterSecurityUserAsync("testuser", "test@gmail.com", "testpassword");
-			Assert.IsNotNull(result.SecurityUser);
+			var securityUser = result.SecurityUser ?? throw new AssertionException("SecurityUser should not be null");
 
-			await domainUserService.CreateDomainUserForSecurityUserAsync(result.SecurityUser);
+			await DomainUserService.CreateDomainUserForSecurityUserAsync(securityUser);
 
 			// Act
-			var domainUser2 = await domainUserService.CreateDomainUserForSecurityUserAsync(result.SecurityUser);
+			var domainUser2 = await DomainUserService.CreateDomainUserForSecurityUserAsync(securityUser);
 
 			// Assert
 			Assert.Null(domainUser2);

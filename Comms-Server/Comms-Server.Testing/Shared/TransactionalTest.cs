@@ -8,11 +8,11 @@ namespace Comms_Server.Testing.Shared
 {
 	public abstract class TransactionalTest : IDisposable
 	{
-		private SqliteConnection _connection;
-		private ServiceProvider _provider;
+		private SqliteConnection? _connection = null;
+		private ServiceProvider? _provider = null;
 
-		protected IFactory Factory;
-		protected IAuthenticationService AuthenticationService;
+		public required IFactory Factory;
+		public required IAuthenticationService AuthenticationService;
 
 		[SetUp]
 		public virtual async Task Setup()
@@ -25,8 +25,8 @@ namespace Comms_Server.Testing.Shared
 
 		public void Dispose()
 		{
-			_provider.Dispose();
-			_connection.Dispose();
+			_provider?.Dispose();
+			_connection?.Dispose();
 		}
 	}
 }
