@@ -11,11 +11,12 @@
 
 			<label class="block mb-3 w-full">
     	  		<span class="sr-only">Password</span>
-    	  		<div class="relative">
+    	  		<div class="relative w-full">
     	    		<input v-model="password" :type="show ? 'text' : 'password'" autocomplete="current-password" required
-    	           	class="p-2 border rounded pr-10" placeholder="Password" />
-    	    		<button type="button" @click="show = !show" class="absolute right-2 top-2 text-sm">
-    	      			{{ show ? 'Hide' : 'Show' }}
+    	           	class="w-full p-2 border rounded pr-10" placeholder="Password" />
+    	    		<button type="button" @click="show = !show">
+						<Eye v-if="show" :size="15" />
+						<EyeOff v-else :size="15"/>
     	    		</button>
     	  		</div>
     		</label>
@@ -30,7 +31,8 @@
 </template>
 
 <script setup lang="ts">
-	import { ref } from 'vue';
+	import { Eye, EyeOff } from 'lucide-vue-next'
+	import { ref } from 'vue'
 	const email = ref('')
 	const password = ref('')
 	const show = ref(false)
