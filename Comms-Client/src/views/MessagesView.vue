@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-	import { useAuthStore } from '@/stores/auth.ts'
+	import { useAuthStore } from '@/stores/auth'
 	import ToolBar from '@/components/messages/ToolBar.vue'
 
 	const authStore = useAuthStore()
