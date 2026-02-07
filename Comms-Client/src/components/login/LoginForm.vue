@@ -21,7 +21,7 @@
     	  		</div>
     		</label>
 
-			<button type="submit" :disabled="loading" class="btn-primary text-white p-2 rounded">
+			<button type="submit" v-on:click="submit" :disabled="loading" class="btn-primary text-white p-2 rounded">
     	  		<span v-if="loading">Signing in…</span><span v-else>Sign in</span>
     		</button>
 
@@ -33,13 +33,31 @@
 <script setup lang="ts">
 	import { Eye, EyeOff } from 'lucide-vue-next'
 	import { ref } from 'vue'
+	import { useAuthStore } from '@/stores/auth'
+	import router from '@/router'
 	const email = ref('')
 	const password = ref('')
 	const show = ref(false)
 	const loading = ref(false)
 	const error = ref('')
+	const authStore = useAuthStore()
 
 	async function submit() {
-		console.log('Attempted login with', email.value, password.value);
+		loading.value = true
+		error.value = ''
+
+		try {
+			const result = await authStore.login(email.value, password.value)
+
+			if (!result.success) {
+				error.value = result.error
+				return
+			}
+
+			router.push('/messages')
+		}
+		finally {
+			loading.value = false
+		}
 	}
 </script>

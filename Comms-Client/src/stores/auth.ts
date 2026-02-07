@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { User } from '@/types'
+import type { User, LoginSuccessResponse } from '@/types'
 import { ref, computed } from 'vue'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -15,8 +15,28 @@ export const useAuthStore = defineStore('auth', () => {
 	if (storedUser) user.value = JSON.parse(storedUser)
 	if (storedToken) token.value = storedToken
 
-	async function login(userData: User, authToken: string) {
-		// Login logic here (API CALLS ETC)
+	async function login(email: string, password: string) {
+		const res = await fetch('api/login', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ email, password })
+		})
+
+		const body = await res.json().catch(() => ({}))
+
+		if (!res.ok) {
+			const errorMessage = 'error' in body ? body.error : 'Login failed'
+			return { success: false, error: errorMessage }
+		}
+
+		const { token: retrievedToken, user: retrievedUser } = body as LoginSuccessResponse
+
+		token.value = retrievedToken
+		user.value = retrievedUser
+		localStorage.setItem('token', retrievedToken)
+		localStorage.setItem('user', JSON.stringify(retrievedUser))
+
+		return { success: true }
 	}
 
 	function logout() {
