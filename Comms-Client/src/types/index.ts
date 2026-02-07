@@ -3,3 +3,12 @@ export interface User {
 	username: string,
 	email: string
 }
+
+export interface ApiErrorResponse {
+	error: string
+}
+
+export interface LoginSuccessResponse {
+	token: string,
+	user: User
+}
