@@ -1,5 +1,4 @@
-﻿using Comms_Server.Database.Models.User;
-using Comms_Server.Services.Authentication;
+﻿using Comms_Server.Services.Authentication;
 using Comms_Server.Services.User;
 using Comms_Server.Testing.Shared;
 using Microsoft.Extensions.DependencyInjection;
