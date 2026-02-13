@@ -37,9 +37,10 @@ namespace Comms_Server
 				.AddDefaultTokenProviders();
 
 			// Application services
+			services.AddScoped<IUserService, UserService>();
 			services.AddScoped<IDomainUserService, DomainUserService>();
-			services.AddScoped<IAuthManager, AuthManager>();
 			services.AddScoped<IAuthenticationService, AuthenticationService>();
+			services.AddScoped<IAuthManager, AuthManager>();
 
 			// Logging
 			services.AddLogging();

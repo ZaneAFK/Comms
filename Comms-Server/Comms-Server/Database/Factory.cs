@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Comms_Server.Database.DbContext;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Comms_Server.Database
 {
@@ -87,6 +88,15 @@ namespace Comms_Server.Database
 		{
 			_context.Set<T>().Remove(entity);
 			await _context.SaveChangesAsync();
+		}
+
+		/// <summary>
+		/// Start a new database transaction.
+		/// </summary>
+		/// <returns>Transaction.</returns>
+		public async Task<IDbContextTransaction> BeginTransactionAsync()
+		{
+			return await _context.Database.BeginTransactionAsync();
 		}
 
 		/// <summary>
