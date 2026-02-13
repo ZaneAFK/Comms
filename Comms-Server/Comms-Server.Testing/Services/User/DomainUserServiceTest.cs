@@ -32,8 +32,8 @@ namespace Comms_Server.Testing.Services.User
 			var domainUser = await DomainUserService.CreateDomainUserForSecurityUserAsync(securityUser) ?? throw new AssertionException("DomainUser should not be null");
 
 			// Assert
-			Assert.IsNotNull(domainUser);
-			Assert.IsNotNull(Factory.GetAsync<DomainUser>(domainUser.Id));
+			Assert.IsNotNull(domainUser, "Domain user should have been successfully created.");
+			AssertAmountOfDomainUsersSaved(1);
 		}
 
 		[Test]
@@ -49,8 +49,8 @@ namespace Comms_Server.Testing.Services.User
 			var domainUser2 = await DomainUserService.CreateDomainUserForSecurityUserAsync(securityUser);
 
 			// Assert
-			Assert.Null(domainUser2);
-			Assert.IsNotNull(((List<DomainUser>)await Factory.GetAllAsync<DomainUser>()).Count() == 1);
+			Assert.IsNull(domainUser2, "Domain user should have failed to create due there already existing a security and domain user.");
+			AssertAmountOfDomainUsersSaved(1);
 		}
 	}
 }

@@ -29,8 +29,8 @@ namespace Comms_Server.Testing.Services.Authentication
 			var securityUser = result.SecurityUser ?? throw new AssertionException("SecurityUser should not be null");
 
 			// Assert
-			Assert.IsTrue(result.Succeeded);
-			Assert.IsNotNull(Factory.GetAsync<SecurityUser>(securityUser.Id));
+			Assert.IsTrue(result.Succeeded, "Security user should be successfully registered.");
+			AssertAmountOfSecurityUsersSaved(1);
 		}
 
 		[Test]
@@ -47,8 +47,9 @@ namespace Comms_Server.Testing.Services.Authentication
 			var result = await failingAuthenticationService.RegisterSecurityUserAsync("TestUser", "testuser@hotmail.com", "supersecure123!");
 
 			// Assert
-			Assert.IsFalse(result.Succeeded);
+			Assert.IsFalse(result.Succeeded, "Security user should have failed to register.");
 			Assert.IsNull(result.SecurityUser);
+			AssertAmountOfSecurityUsersSaved(0);
 		}
 
 		[Test]
@@ -62,9 +63,10 @@ namespace Comms_Server.Testing.Services.Authentication
 			var result = await AuthenticationService.RegisterSecurityUserAsync("AnotherUser", "testuser@hotmail.com", "anotherpassword");
 
 			// Assert
-			Assert.IsFalse(result.Succeeded);
+			Assert.IsFalse(result.Succeeded, "Security user should have failed to register due to another existing user with the same email.");
 			var errorMessage = result.IdentityResult.Errors.FirstOrDefault()?.Description;
 			Assert.AreEqual("Email 'testuser@hotmail.com' is already taken.", errorMessage);
+			AssertAmountOfSecurityUsersSaved(1);
 		}
 	}
 }

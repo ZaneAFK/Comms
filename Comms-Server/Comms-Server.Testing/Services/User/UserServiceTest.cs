@@ -82,15 +82,6 @@ namespace Comms_Server.Testing.Services.User
 			// Assert
 			Assert.IsNull(secondResult, "Registration should fail due to duplicate email.");
 			AssertAmountOfDomainSecurityUsersSaved(1);
-
-		}
-
-		async void AssertAmountOfDomainSecurityUsersSaved(int amount)
-		{
-			var securityUsers = (List<SecurityUser>)await Factory.GetAllAsync<SecurityUser>();
-			var domainUsers = (List<DomainUser>)await Factory.GetAllAsync<DomainUser>();
-			Assert.AreEqual(securityUsers.Count, amount);
-			Assert.AreEqual(domainUsers.Count, amount);
 		}
 	}
 }
