@@ -21,23 +21,24 @@ namespace Comms_Server.Testing.Shared
 			Factory = _provider.GetRequiredService<IFactory>();
 		}
 
-		protected async void AssertAmountOfDomainUsersSaved(int expectedAmount)
+		protected async Task AssertAmountOfDomainUsersSaved(int expectedAmount)
 		{
 			var domainUsers = (List<DomainUser>)await Factory.GetAllAsync<DomainUser>();
 			Assert.AreEqual(domainUsers.Count, expectedAmount,
 				$"Expected {expectedAmount} DomainUser(s) in the database, but found {domainUsers.Count}.");
 		}
-		protected async void AssertAmountOfSecurityUsersSaved(int expectedAmount)
+
+		protected async Task AssertAmountOfSecurityUsersSaved(int expectedAmount)
 		{
-			var securityUsers = (List<DomainUser>)await Factory.GetAllAsync<SecurityUser>();
+			var securityUsers = (List<SecurityUser>)await Factory.GetAllAsync<SecurityUser>();
 			Assert.AreEqual(securityUsers.Count, expectedAmount,
 				$"Expected {expectedAmount} SecurityUser(s) in the database, but found {securityUsers.Count}.");
 		}
 
-		protected void AssertAmountOfDomainSecurityUsersSaved(int expectedAmount)
+		protected async Task AssertAmountOfDomainSecurityUsersSaved(int expectedAmount)
 		{
-			AssertAmountOfDomainUsersSaved(expectedAmount);
-			AssertAmountOfSecurityUsersSaved(expectedAmount);
+			await AssertAmountOfDomainUsersSaved(expectedAmount);
+			await AssertAmountOfSecurityUsersSaved(expectedAmount);
 		}
 
 		public void Dispose()

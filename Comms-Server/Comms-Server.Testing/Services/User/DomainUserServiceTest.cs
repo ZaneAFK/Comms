@@ -32,7 +32,7 @@ namespace Comms_Server.Testing.Services.User
 
 			// Assert
 			Assert.IsNotNull(domainUser, "Domain user should have been successfully created.");
-			AssertAmountOfDomainUsersSaved(1);
+			await AssertAmountOfDomainUsersSaved(1);
 		}
 
 		[Test]
@@ -49,7 +49,7 @@ namespace Comms_Server.Testing.Services.User
 
 			// Assert
 			Assert.IsNull(domainUser2, "Domain user should have failed to create due there already existing a security and domain user.");
-			AssertAmountOfDomainUsersSaved(1);
+			await AssertAmountOfDomainUsersSaved(1);
 		}
 	}
 }

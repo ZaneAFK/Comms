@@ -30,7 +30,7 @@ namespace Comms_Server.Testing.Services.Authentication
 
 			// Assert
 			Assert.IsTrue(result.Succeeded, "Security user should be successfully registered.");
-			AssertAmountOfSecurityUsersSaved(1);
+			await AssertAmountOfSecurityUsersSaved(1);
 		}
 
 		[Test]
@@ -49,7 +49,7 @@ namespace Comms_Server.Testing.Services.Authentication
 			// Assert
 			Assert.IsFalse(result.Succeeded, "Security user should have failed to register.");
 			Assert.IsNull(result.SecurityUser);
-			AssertAmountOfSecurityUsersSaved(0);
+			await AssertAmountOfSecurityUsersSaved(0);
 		}
 
 		[Test]
@@ -66,7 +66,7 @@ namespace Comms_Server.Testing.Services.Authentication
 			Assert.IsFalse(result.Succeeded, "Security user should have failed to register due to another existing user with the same email.");
 			var errorMessage = result.IdentityResult.Errors.FirstOrDefault()?.Description;
 			Assert.AreEqual("Email 'testuser@hotmail.com' is already taken.", errorMessage);
-			AssertAmountOfSecurityUsersSaved(1);
+			await AssertAmountOfSecurityUsersSaved(1);
 		}
 	}
 }

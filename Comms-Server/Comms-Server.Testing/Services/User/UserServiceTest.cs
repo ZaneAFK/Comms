@@ -31,7 +31,7 @@ namespace Comms_Server.Testing.Services.User
 
 			// Assert
 			Assert.IsNotNull(result, "Registration of new user should succeed.");
-			AssertAmountOfDomainSecurityUsersSaved(1);
+			await AssertAmountOfDomainSecurityUsersSaved(1);
 		}
 
 		[Test]
@@ -49,7 +49,7 @@ namespace Comms_Server.Testing.Services.User
 
 			// Assert
 			Assert.IsNull(result, "Registration should fail when security user cannot be created.");
-			AssertAmountOfDomainSecurityUsersSaved(0);
+			await AssertAmountOfDomainSecurityUsersSaved(0);
 		}
 
 		[Test]
@@ -67,7 +67,7 @@ namespace Comms_Server.Testing.Services.User
 
 			// Assert
 			Assert.IsNull(result, "Registration should fail when domain user cannot be created.");
-			AssertAmountOfDomainSecurityUsersSaved(0);
+			await AssertAmountOfDomainSecurityUsersSaved(0);
 		}
 
 		public async Task TestRegisterUserAsync_UserWithExistingEmail_Fails()
@@ -81,7 +81,7 @@ namespace Comms_Server.Testing.Services.User
 
 			// Assert
 			Assert.IsNull(secondResult, "Registration should fail due to duplicate email.");
-			AssertAmountOfDomainSecurityUsersSaved(1);
+			await AssertAmountOfDomainSecurityUsersSaved(1);
 		}
 	}
 }
