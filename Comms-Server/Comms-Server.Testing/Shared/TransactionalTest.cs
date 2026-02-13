@@ -1,5 +1,4 @@
 ﻿using Comms_Server.Database;
-using Comms_Server.Services.Authentication;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -12,7 +11,6 @@ namespace Comms_Server.Testing.Shared
 		protected ServiceProvider _provider = null!;
 
 		public required IFactory Factory;
-		public required IAuthenticationService AuthenticationService;
 
 		[SetUp]
 		public virtual async Task Setup()
@@ -20,7 +18,6 @@ namespace Comms_Server.Testing.Shared
 			(_provider, _connection) = await TestDatabaseFactory.CreateAsync();
 
 			Factory = _provider.GetRequiredService<IFactory>();
-			AuthenticationService = _provider.GetRequiredService<IAuthenticationService>();
 		}
 
 		public void Dispose()

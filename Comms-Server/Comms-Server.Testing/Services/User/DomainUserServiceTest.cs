@@ -1,6 +1,8 @@
 ﻿using Comms_Server.Database.Models.User;
+using Comms_Server.Services.Authentication;
 using Comms_Server.Services.User;
 using Comms_Server.Testing.Shared;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace Comms_Server.Testing.Services.User
@@ -8,13 +10,15 @@ namespace Comms_Server.Testing.Services.User
 	[TestFixture]
 	public class DomainUserServiceTest : TransactionalTest
 	{
+		public required IAuthenticationService AuthenticationService;
 		public required DomainUserService DomainUserService;
 
 		public override async Task Setup()
 		{
 			await base.Setup();
 
-			DomainUserService = new DomainUserService(Factory);
+			DomainUserService = (DomainUserService)_provider.GetRequiredService<IDomainUserService>();
+			AuthenticationService = _provider.GetRequiredService<IAuthenticationService>();
 		}
 
 		[Test]

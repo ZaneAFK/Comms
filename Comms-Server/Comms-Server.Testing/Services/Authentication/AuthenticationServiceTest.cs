@@ -2,6 +2,7 @@
 using Comms_Server.Services.Authentication;
 using Comms_Server.Testing.Shared;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 
@@ -10,10 +11,14 @@ namespace Comms_Server.Testing.Services.Authentication
 	[TestFixture]
 	public class AuthenticationServiceTest : TransactionalTest
 	{
+		public required AuthenticationService AuthenticationService;
+
 		[SetUp]
 		public override async Task Setup()
 		{
 			await base.Setup();
+
+			AuthenticationService = (AuthenticationService)_provider.GetRequiredService<IAuthenticationService>();
 		}
 
 		[Test]
