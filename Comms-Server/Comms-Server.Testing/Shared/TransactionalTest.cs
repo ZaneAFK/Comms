@@ -9,7 +9,7 @@ namespace Comms_Server.Testing.Shared
 	public abstract class TransactionalTest : IDisposable
 	{
 		private SqliteConnection? _connection = null;
-		private ServiceProvider? _provider = null;
+		protected ServiceProvider _provider = null!;
 
 		public required IFactory Factory;
 		public required IAuthenticationService AuthenticationService;

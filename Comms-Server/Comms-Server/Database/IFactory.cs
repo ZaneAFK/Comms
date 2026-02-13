@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Comms_Server.Database
 {
@@ -11,6 +12,7 @@ namespace Comms_Server.Database
 		T New<T>() where T : class, new();
 		Task UpdateAsync<T>(T entity) where T : class;
 		Task DeleteAsync<T>(T entity) where T : class;
+		Task<IDbContextTransaction> BeginTransactionAsync();
 		Task SaveAsync();
 	}
 }

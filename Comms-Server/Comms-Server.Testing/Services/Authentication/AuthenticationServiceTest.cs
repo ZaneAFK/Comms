@@ -50,7 +50,8 @@ namespace Comms_Server.Testing.Services.Authentication
 		public async Task TestRegisterSecurityUserAsync_ExistingSecurityUserWithEmail_Fails()
 		{
 			// Arrange
-			_ = await AuthenticationService.RegisterSecurityUserAsync("TestUser", "testuser@hotmail.com", "supersecure123!");
+			var firstResult = await AuthenticationService.RegisterSecurityUserAsync("TestUser", "testuser@hotmail.com", "supersecure123!");
+			Assert.IsTrue(firstResult.Succeeded, "Precondition: First registration should succeed");
 
 			// Act
 			var result = await AuthenticationService.RegisterSecurityUserAsync("AnotherUser", "testuser@hotmail.com", "anotherpassword");
