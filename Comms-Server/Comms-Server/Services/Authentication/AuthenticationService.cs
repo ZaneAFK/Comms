@@ -1,44 +1,52 @@
 ﻿using Comms_Server.Database;
-using Comms_Server.Database.Models.User;
-using Comms_Server.Shared.Results;
+using Comms_Server.DTOs;
+using Comms_Server.Services.User;
 
 namespace Comms_Server.Services.Authentication
 {
 	public class AuthenticationService : Service, IAuthenticationService
 	{
-		private readonly IAuthManager _authManager;
+		private readonly ISecurityUserService _securityUserService;
+		private readonly IDomainUserService _domainUserService;
 
-		public AuthenticationService(IFactory factory, IAuthManager authManager) : base(factory)
+		public AuthenticationService(IFactory factory, ISecurityUserService securityUserService, IDomainUserService domainUserService) : base(factory)
 		{
-			_authManager = authManager;
+			_securityUserService = securityUserService;
+			_domainUserService = domainUserService;
 		}
 
-		/// <summary>
-		/// Registers a new security user with the provided username, email and password.
-		/// It is NOT required to call SaveChangesAsync after this method, as it is handled internally.
-		/// </summary>
-		public async Task<SecurityUserRegistrationResult> RegisterSecurityUserAsync(string username, string email, string password)
+		public async Task<RegisterUserResponse?> RegisterUserAsync(string username, string email, string password)
 		{
+			using var transaction = await Factory.BeginTransactionAsync();
+
 			try
 			{
-				var securityUser = new SecurityUser
-				{
-					UserName = username,
-					Email = email
-				};
-
-				var result = await _authManager.RegisterSecurityUserAsync(securityUser, password);
+				var result = await _securityUserService.RegisterSecurityUserAsync(username, email, password);
 
 				if (!result.Succeeded)
 				{
-					return new SecurityUserRegistrationResult(result, null);
+					return null;
 				}
 
-				return new SecurityUserRegistrationResult(result, securityUser);
+				var domainUser = await _domainUserService.CreateDomainUserForSecurityUserAsync(result.SecurityUser!);
+
+				if (domainUser is null)
+				{
+					return null;
+				}
+
+				transaction.Commit();
+
+				return new RegisterUserResponse
+				{
+					UserId = domainUser.Id,
+					Username = domainUser.Username,
+					Email = result.SecurityUser!.Email!
+				};
 			}
-			catch (Exception ex)
+			catch
 			{
-				throw new Exception("Failed to create and register SecurityUser instance.", ex);
+				return null;
 			}
 		}
 	}
