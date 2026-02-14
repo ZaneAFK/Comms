@@ -9,7 +9,7 @@ namespace Comms_Server.Testing.Services.User
 	[TestFixture]
 	public class DomainUserServiceTest : TransactionalTest
 	{
-		public required IAuthenticationService AuthenticationService;
+		public required ISecurityUserService SecurityUserService;
 		public required DomainUserService DomainUserService;
 
 		public override async Task Setup()
@@ -17,14 +17,14 @@ namespace Comms_Server.Testing.Services.User
 			await base.Setup();
 
 			DomainUserService = (DomainUserService)_provider.GetRequiredService<IDomainUserService>();
-			AuthenticationService = _provider.GetRequiredService<IAuthenticationService>();
+			SecurityUserService = _provider.GetRequiredService<ISecurityUserService>();
 		}
 
 		[Test]
 		public async Task TestCreateDomainUserForSecurityUser_CreatesDomainUser()
 		{
 			// Arrange
-			var result = await AuthenticationService.RegisterSecurityUserAsync("testuser", "test@gmail.com", "testpassword");
+			var result = await SecurityUserService.RegisterSecurityUserAsync("testuser", "test@gmail.com", "testpassword");
 			var securityUser = result.SecurityUser ?? throw new AssertionException("SecurityUser should not be null");
 
 			// Act
@@ -39,7 +39,7 @@ namespace Comms_Server.Testing.Services.User
 		public async Task TestCreateDomainUserForSecurityUser_CreatingDuplicateDomainUser_ReturnsNull()
 		{
 			// Arrange
-			var result = await AuthenticationService.RegisterSecurityUserAsync("testuser", "test@gmail.com", "testpassword");
+			var result = await SecurityUserService.RegisterSecurityUserAsync("testuser", "test@gmail.com", "testpassword");
 			var securityUser = result.SecurityUser ?? throw new AssertionException("SecurityUser should not be null");
 
 			await DomainUserService.CreateDomainUserForSecurityUserAsync(securityUser);

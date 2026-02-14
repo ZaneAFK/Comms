@@ -1,9 +1,9 @@
-﻿using Comms_Server.Shared.Results;
+﻿using Comms_Server.DTOs;
 
 namespace Comms_Server.Services.Authentication
 {
 	public interface IAuthenticationService
 	{
-		Task<SecurityUserRegistrationResult> RegisterSecurityUserAsync(string username, string email, string password);
+		Task<RegisterUserResponse?> RegisterUserAsync(string username, string email, string password);
 	}
 }
