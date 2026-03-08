@@ -16,6 +16,8 @@ namespace Comms_Server.Services.User
 
 		public async Task<Result<AppUser>> RegisterUserAsync(string username, string email, string password)
 		{
+			using var transaction = await Factory.BeginTransactionAsync();
+
 			var user = new AppUser
 			{
 				UserName = username,
@@ -26,6 +28,7 @@ namespace Comms_Server.Services.User
 			if (!identityResult.Succeeded)
 			{
 				var errors = identityResult.Errors.Select(e => e.Description);
+				await transaction.RollbackAsync();
 				return Result<AppUser>.Failure(errors);
 			}
 
@@ -33,9 +36,11 @@ namespace Comms_Server.Services.User
 			if (!roleResult.Succeeded)
 			{
 				var errors = roleResult.Errors.Select(e => e.Description);
+				await transaction.RollbackAsync();
 				return Result<AppUser>.Failure(errors);
 			}
 
+			await transaction.CommitAsync();
 			return Result<AppUser>.Success(user);
 		}
 
