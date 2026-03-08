@@ -1,7 +1,3 @@
-// Tests for UserService — the consolidated user service that replaces the former
-// SecurityUserService + DomainUserService pair. Covers registration (success and
-// duplicate-email failure) and retrieval by ID (existing and non-existent).
-
 using Comms_Server.Services.User;
 using Comms_Server.Testing.Shared;
 using Microsoft.Extensions.DependencyInjection;
