@@ -1,4 +1,4 @@
-﻿using Comms_Server.Database;
+using Comms_Server.Database;
 using Comms_Server.Database.DbContext;
 using Comms_Server.Database.Models.User;
 using Comms_Server.Services.Authentication;
@@ -25,7 +25,7 @@ namespace Comms_Server
 			services.AddScoped<IFactory, Factory>();
 
 			// Identity services
-			services.AddIdentity<SecurityUser, IdentityRole<Guid>>(options =>
+			services.AddIdentity<AppUser, IdentityRole<Guid>>(options =>
 			{
 				options.Password.RequireDigit = false;
 				options.Password.RequireUppercase = false;
@@ -38,9 +38,7 @@ namespace Comms_Server
 
 			// Application services
 			services.AddScoped<IAuthenticationService, AuthenticationService>();
-			services.AddScoped<IDomainUserService, DomainUserService>();
-			services.AddScoped<ISecurityUserService, SecurityUserService>();
-			services.AddScoped<IAuthManager, AuthManager>();
+			services.AddScoped<IUserService, UserService>();
 
 			// Logging
 			services.AddLogging();
