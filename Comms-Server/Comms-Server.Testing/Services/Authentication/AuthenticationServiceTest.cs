@@ -4,8 +4,8 @@ using Comms_Server.Shared.Results;
 using Comms_Server.Testing.Shared;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using Comms_Server.Database.Models.User;
 using NUnit.Framework;
-using UserModel = Comms_Server.Database.Models.User.User;
 
 namespace Comms_Server.Testing.Services.Authentication
 {
@@ -40,7 +40,7 @@ namespace Comms_Server.Testing.Services.Authentication
 			var mockUserService = new Mock<IUserService>();
 			mockUserService
 				.Setup(x => x.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-				.ReturnsAsync(Result<UserModel>.Failure(new[] { "Registration failed" }));
+				.ReturnsAsync(Result<AppUser>.Failure(new[] { "Registration failed" }));
 
 			var failingAuthenticationService = new AuthenticationService(Factory, mockUserService.Object);
 

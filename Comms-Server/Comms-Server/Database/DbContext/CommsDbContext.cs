@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Comms_Server.Database.DbContext
 {
-	public class CommsDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
+	public class CommsDbContext : IdentityDbContext<AppUser, IdentityRole<Guid>, Guid>
 	{
 		public CommsDbContext(DbContextOptions<CommsDbContext> options)
 			: base(options)

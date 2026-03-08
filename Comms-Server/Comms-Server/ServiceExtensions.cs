@@ -25,7 +25,7 @@ namespace Comms_Server
 			services.AddScoped<IFactory, Factory>();
 
 			// Identity services
-			services.AddIdentity<User, IdentityRole<Guid>>(options =>
+			services.AddIdentity<AppUser, IdentityRole<Guid>>(options =>
 			{
 				options.Password.RequireDigit = false;
 				options.Password.RequireUppercase = false;

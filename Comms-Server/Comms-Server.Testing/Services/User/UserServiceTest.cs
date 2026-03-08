@@ -6,7 +6,6 @@ using Comms_Server.Services.User;
 using Comms_Server.Testing.Shared;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using UserModel = Comms_Server.Database.Models.User.User;
 
 namespace Comms_Server.Testing.Services.User
 {

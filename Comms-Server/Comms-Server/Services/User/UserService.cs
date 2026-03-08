@@ -1,43 +1,47 @@
 using Comms_Server.Database;
+using Comms_Server.Database.Models.User;
 using Comms_Server.Shared.Results;
 using Microsoft.AspNetCore.Identity;
-using UserModel = Comms_Server.Database.Models.User.User;
 
 namespace Comms_Server.Services.User
 {
 	public class UserService : Service, IUserService
 	{
-		private readonly UserManager<UserModel> _userManager;
+		private readonly UserManager<AppUser> _userManager;
 
-		public UserService(IFactory factory, UserManager<UserModel> userManager) : base(factory)
+		public UserService(IFactory factory, UserManager<AppUser> userManager) : base(factory)
 		{
 			_userManager = userManager;
 		}
 
-		public async Task<Result<UserModel>> RegisterUserAsync(string username, string email, string password)
+		public async Task<Result<AppUser>> RegisterUserAsync(string username, string email, string password)
 		{
-			var user = new UserModel
+			var user = new AppUser
 			{
 				UserName = username,
 				Email = email
 			};
 
 			var identityResult = await _userManager.CreateAsync(user, password);
-
 			if (!identityResult.Succeeded)
 			{
 				var errors = identityResult.Errors.Select(e => e.Description);
-				return Result<UserModel>.Failure(errors);
+				return Result<AppUser>.Failure(errors);
 			}
 
-			await _userManager.AddToRolesAsync(user, new[] { "User" });
+			var roleResult = await _userManager.AddToRolesAsync(user, new[] { "User" });
+			if (!roleResult.Succeeded)
+			{
+				var errors = roleResult.Errors.Select(e => e.Description);
+				return Result<AppUser>.Failure(errors);
+			}
 
-			return Result<UserModel>.Success(user);
+			return Result<AppUser>.Success(user);
 		}
 
-		public async Task<UserModel?> GetByIdAsync(Guid id)
+		public async Task<AppUser?> GetByIdAsync(Guid id)
 		{
-			return await Factory.GetAsync<UserModel>(id);
+			return await _userManager.FindByIdAsync(id.ToString());
 		}
 	}
 }

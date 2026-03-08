@@ -23,8 +23,8 @@ namespace Comms_Server.Testing.Shared
 
 		protected async Task AssertAmountOfUsersSaved(int expectedAmount)
 		{
-			var users = (List<User>)await Factory.GetAllAsync<User>();
-			Assert.AreEqual(users.Count, expectedAmount,
+			var users = (List<AppUser>)await Factory.GetAllAsync<AppUser>();
+			Assert.AreEqual(expectedAmount, users.Count,
 				$"Expected {expectedAmount} User(s) in the database, but found {users.Count}.");
 		}
 
