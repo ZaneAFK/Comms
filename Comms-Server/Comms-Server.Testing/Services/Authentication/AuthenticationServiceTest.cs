@@ -1,10 +1,10 @@
+using Comms_Server.Database.Models.User;
 using Comms_Server.Services.Authentication;
 using Comms_Server.Services.User;
 using Comms_Server.Shared.Results;
 using Comms_Server.Testing.Shared;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Comms_Server.Database.Models.User;
 using NUnit.Framework;
 
 namespace Comms_Server.Testing.Services.Authentication
