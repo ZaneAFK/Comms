@@ -1,4 +1,4 @@
-﻿using Comms_Server.Database;
+using Comms_Server.Database;
 using Comms_Server.DTOs;
 using Comms_Server.Services.User;
 
@@ -6,48 +6,30 @@ namespace Comms_Server.Services.Authentication
 {
 	public class AuthenticationService : Service, IAuthenticationService
 	{
-		private readonly ISecurityUserService _securityUserService;
-		private readonly IDomainUserService _domainUserService;
+		private readonly IUserService _userService;
 
-		public AuthenticationService(IFactory factory, ISecurityUserService securityUserService, IDomainUserService domainUserService) : base(factory)
+		public AuthenticationService(IFactory factory, IUserService userService) : base(factory)
 		{
-			_securityUserService = securityUserService;
-			_domainUserService = domainUserService;
+			_userService = userService;
 		}
 
 		public async Task<RegisterUserResponse?> RegisterUserAsync(string username, string email, string password)
 		{
-			using var transaction = await Factory.BeginTransactionAsync();
+			var result = await _userService.RegisterUserAsync(username, email, password);
 
-			try
-			{
-				var result = await _securityUserService.RegisterSecurityUserAsync(username, email, password);
-
-				if (!result.Succeeded)
-				{
-					return null;
-				}
-
-				var domainUser = await _domainUserService.CreateDomainUserForSecurityUserAsync(result.SecurityUser!);
-
-				if (domainUser is null)
-				{
-					return null;
-				}
-
-				transaction.Commit();
-
-				return new RegisterUserResponse
-				{
-					UserId = domainUser.Id,
-					Username = domainUser.Username,
-					Email = result.SecurityUser!.Email!
-				};
-			}
-			catch
+			if (!result.Succeeded)
 			{
 				return null;
 			}
+
+			var user = result.Value!;
+
+			return new RegisterUserResponse
+			{
+				UserId = user.Id,
+				Username = user.UserName!,
+				Email = user.Email!
+			};
 		}
 	}
 }

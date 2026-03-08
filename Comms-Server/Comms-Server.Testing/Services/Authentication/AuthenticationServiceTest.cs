@@ -1,12 +1,11 @@
-﻿using Comms_Server.Database.Models.User;
 using Comms_Server.Services.Authentication;
 using Comms_Server.Services.User;
 using Comms_Server.Shared.Results;
 using Comms_Server.Testing.Shared;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
+using UserModel = Comms_Server.Database.Models.User.User;
 
 namespace Comms_Server.Testing.Services.Authentication
 {
@@ -31,46 +30,30 @@ namespace Comms_Server.Testing.Services.Authentication
 
 			// Assert
 			Assert.IsNotNull(result, "Registration of new user should succeed.");
-			await AssertAmountOfDomainSecurityUsersSaved(1);
+			await AssertAmountOfUsersSaved(1);
 		}
 
 		[Test]
-		public async Task TestRegisterUserAsync_CannotRegisterSecurityUser_RollsBackAndReturnsNull()
+		public async Task TestRegisterUserAsync_CannotRegisterUser_ReturnsNull()
 		{
 			// Arrange
-			var mockSecurityUserService = new Mock<ISecurityUserService>();
-			mockSecurityUserService.Setup(x => x.RegisterSecurityUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-				.ReturnsAsync(new SecurityUserRegistrationResult(IdentityResult.Failed(new IdentityError { Description = "Registration failed" }), null));
+			var mockUserService = new Mock<IUserService>();
+			mockUserService
+				.Setup(x => x.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+				.ReturnsAsync(Result<UserModel>.Failure(new[] { "Registration failed" }));
 
-			var failingAuthenticationService = new AuthenticationService(Factory, mockSecurityUserService.Object, _provider.GetRequiredService<IDomainUserService>());
+			var failingAuthenticationService = new AuthenticationService(Factory, mockUserService.Object);
 
 			// Act
 			var result = await failingAuthenticationService.RegisterUserAsync("TestUser", "testuser@hotmail.com", "supersecure123!");
 
 			// Assert
-			Assert.IsNull(result, "Registration should fail when security user cannot be created.");
-			await AssertAmountOfDomainSecurityUsersSaved(0);
+			Assert.IsNull(result, "Registration should fail when user service returns a failure result.");
+			await AssertAmountOfUsersSaved(0);
 		}
 
 		[Test]
-		public async Task TestRegisterUserAsync_CannotCreateDomainUser_RollsBackAndReturnsNull()
-		{
-			// Arrange
-			var mockDomainUserService = new Mock<IDomainUserService>();
-			mockDomainUserService.Setup(x => x.CreateDomainUserForSecurityUserAsync(It.IsAny<SecurityUser>()))
-				.ReturnsAsync((DomainUser?)null);
-
-			var failingAuthenticationService = new AuthenticationService(Factory, _provider.GetRequiredService<ISecurityUserService>(), mockDomainUserService.Object);
-
-			// Act
-			var result = await failingAuthenticationService.RegisterUserAsync("TestUser", "testuser@hotmail.com", "supersecure123!");
-
-			// Assert
-			Assert.IsNull(result, "Registration should fail when domain user cannot be created.");
-			await AssertAmountOfDomainSecurityUsersSaved(0);
-		}
-
-		public async Task TestRegisterUserAsync_UserWithExistingEmail_RollsBackAndReturnsNull()
+		public async Task TestRegisterUserAsync_UserWithExistingEmail_ReturnsNull()
 		{
 			// Arrange
 			var firstResult = await AuthenticationService.RegisterUserAsync("TestUser", "testuser@hotmail.com", "supersecure123!");
@@ -81,7 +64,7 @@ namespace Comms_Server.Testing.Services.Authentication
 
 			// Assert
 			Assert.IsNull(secondResult, "Registration should fail due to duplicate email.");
-			await AssertAmountOfDomainSecurityUsersSaved(1);
+			await AssertAmountOfUsersSaved(1);
 		}
 	}
 }
