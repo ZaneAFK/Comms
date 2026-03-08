@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(gh api:*)",
-      "Bash(dotnet build:*)",
-      "Bash(dotnet test:*)"
-    ]
-  }
-}
