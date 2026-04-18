@@ -10,10 +10,10 @@ namespace Comms_Server
 {
 	public static class ServiceExtensions
 	{
-		public static IServiceCollection AttachCommsDatabase(this IServiceCollection services)
+		public static IServiceCollection AttachCommsDatabase(this IServiceCollection services, IConfiguration configuration)
 		{
 			services.AddDbContext<CommsDbContext>(options =>
-				options.UseNpgsql(Database.Database.GetConnectionString())
+				options.UseNpgsql(configuration.GetConnectionString("Default"))
 			);
 
 			return services;

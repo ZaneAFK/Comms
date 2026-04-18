@@ -5,13 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load development env variables
-if (builder.Environment.IsDevelopment())
-{
-	DotNetEnv.Env.Load("../../.env");
-}
-
-builder.Services.AttachCommsDatabase();
+builder.Services.AttachCommsDatabase(builder.Configuration);
 builder.Services.AddCommsServices();
 
 // Add services to the container.
