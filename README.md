@@ -40,9 +40,11 @@ Below are the prerequisites and the suggested workflow for development.
 ### Backend - Suggested Setup
 1. Ensure **.NET SDK 8.0** and **Docker** is installed
 2. Create a `.env` file based on `.env.template` and fill in the required variables
-3. Start the Postgres database using Docker Compose:
+3. Create an `appsettings.Development.json` file in `Comms-Server/Comms-Server/` based on `appsettings.Development.json.template` and fill in your database credentials
+4. Start the Postgres database using Docker Compose:
    - `docker compose up -d`
-4. If you make changes that update the database schema, create a new migration:
+5. Run the backend
+6. If you make changes that update the database schema, create a new migration:
    - `dotnet ef migrations add CommsDb_<Migration_Number>`
    - Replace <Migration_Number> with the latest migration identifier
    - E.g `dotnet ef migrations add CommsDb_6`
