@@ -28,12 +28,13 @@ namespace Comms_Server.Testing.Services
 			var result = await AuthenticationService.RegisterUserAsync("TestUser", "testuser@hotmail.com", "supersecure123!");
 
 			// Assert
-			Assert.IsNotNull(result, "Registration of new user should succeed.");
+			Assert.IsTrue(result.Succeeded, "Registration of new user should succeed.");
+			Assert.IsNull(result.Error);
 			await AssertAmountOfUsersSaved(1);
 		}
 
 		[Test]
-		public async Task TestRegisterUserAsync_CannotRegisterUser_ReturnsNull()
+		public async Task TestRegisterUserAsync_CannotRegisterUser_ReturnsFailed()
 		{
 			// Arrange
 			var mockUserService = new Mock<IUserService>();
@@ -47,22 +48,24 @@ namespace Comms_Server.Testing.Services
 			var result = await failingAuthenticationService.RegisterUserAsync("TestUser", "testuser@hotmail.com", "supersecure123!");
 
 			// Assert
-			Assert.IsNull(result, "Registration should fail when user service returns a failure result.");
+			Assert.IsFalse(result.Succeeded, "Registration should fail when user service returns a failure result.");
+			Assert.IsNotNull(result.Error);
 			await AssertAmountOfUsersSaved(0);
 		}
 
 		[Test]
-		public async Task TestRegisterUserAsync_UserWithExistingEmail_ReturnsNull()
+		public async Task TestRegisterUserAsync_UserWithExistingEmail_ReturnsFailed()
 		{
 			// Arrange
 			var firstResult = await AuthenticationService.RegisterUserAsync("TestUser", "testuser@hotmail.com", "supersecure123!");
-			Assert.IsNotNull(firstResult, "Precondition: First registration should succeed");
+			Assert.IsTrue(firstResult.Succeeded, "Precondition: First registration should succeed");
 
 			// Act
 			var secondResult = await AuthenticationService.RegisterUserAsync("AnotherUser", "testuser@hotmail.com", "someweirdpassword123");
 
 			// Assert
-			Assert.IsNull(secondResult, "Registration should fail due to duplicate email.");
+			Assert.IsFalse(secondResult.Succeeded, "Registration should fail due to duplicate email.");
+			Assert.IsNotNull(secondResult.Error);
 			await AssertAmountOfUsersSaved(1);
 		}
 	}

@@ -12,23 +12,20 @@ namespace Comms_Server.Services
 			_userService = userService;
 		}
 
-		public async Task<RegisterUserResponse?> RegisterUserAsync(string username, string email, string password)
+		public async Task<RegisterUserResponse> RegisterUserAsync(string username, string email, string password)
 		{
 			var result = await _userService.RegisterUserAsync(username, email, password);
 
 			if (!result.Succeeded)
 			{
-				return null;
+				return new RegisterUserResponse
+				{
+					Succeeded = false,
+					Error = string.Join(" ", result.Errors)
+				};
 			}
 
-			var user = result.Value!;
-
-			return new RegisterUserResponse
-			{
-				UserId = user.Id,
-				Username = user.UserName!,
-				Email = user.Email!
-			};
+			return new RegisterUserResponse { Succeeded = true };
 		}
 	}
 }

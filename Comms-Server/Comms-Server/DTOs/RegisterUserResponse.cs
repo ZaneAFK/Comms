@@ -1,9 +1,8 @@
-﻿namespace Comms_Server.DTOs
+namespace Comms_Server.DTOs
 {
 	public class RegisterUserResponse
 	{
-		public Guid UserId { get; set; }
-		public string Username { get; set; } = null!;
-		public string Email { get; set; } = null!;
+		public bool Succeeded { get; set; }
+		public string? Error { get; set; }
 	}
 }
