@@ -1,4 +1,4 @@
-﻿namespace Comms_Server.Shared.Results
+﻿namespace Comms_Server.Shared
 {
 	public class Result<T>
 	{

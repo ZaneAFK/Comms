@@ -1,24 +1,24 @@
 using Comms_Server.Database;
-using Comms_Server.Database.Models.User;
-using Comms_Server.Shared.Results;
+using Comms_Server.Database.Models;
+using Comms_Server.Shared;
 using Microsoft.AspNetCore.Identity;
 
-namespace Comms_Server.Services.User
+namespace Comms_Server.Services
 {
 	public class UserService : Service, IUserService
 	{
-		private readonly UserManager<AppUser> _userManager;
+		private readonly UserManager<User> _userManager;
 
-		public UserService(IFactory factory, UserManager<AppUser> userManager) : base(factory)
+		public UserService(IFactory factory, UserManager<User> userManager) : base(factory)
 		{
 			_userManager = userManager;
 		}
 
-		public async Task<Result<AppUser>> RegisterUserAsync(string username, string email, string password)
+		public async Task<Result<User>> RegisterUserAsync(string username, string email, string password)
 		{
 			using var transaction = await Factory.BeginTransactionAsync();
 
-			var user = new AppUser
+			var user = new User
 			{
 				UserName = username,
 				Email = email
@@ -29,7 +29,7 @@ namespace Comms_Server.Services.User
 			{
 				var errors = identityResult.Errors.Select(e => e.Description);
 				await transaction.RollbackAsync();
-				return Result<AppUser>.Failure(errors);
+				return Result<User>.Failure(errors);
 			}
 
 			var roleResult = await _userManager.AddToRolesAsync(user, new[] { "User" });
@@ -37,14 +37,14 @@ namespace Comms_Server.Services.User
 			{
 				var errors = roleResult.Errors.Select(e => e.Description);
 				await transaction.RollbackAsync();
-				return Result<AppUser>.Failure(errors);
+				return Result<User>.Failure(errors);
 			}
 
 			await transaction.CommitAsync();
-			return Result<AppUser>.Success(user);
+			return Result<User>.Success(user);
 		}
 
-		public async Task<AppUser?> GetByIdAsync(Guid id)
+		public async Task<User?> GetByIdAsync(Guid id)
 		{
 			return await _userManager.FindByIdAsync(id.ToString());
 		}
