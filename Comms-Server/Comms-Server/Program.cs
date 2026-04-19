@@ -1,6 +1,5 @@
 using Comms_Server;
 using Comms_Server.Database;
-using Comms_Server.Database.DbContext;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

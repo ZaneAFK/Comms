@@ -1,8 +1,6 @@
 using Comms_Server.Database;
-using Comms_Server.Database.DbContext;
-using Comms_Server.Database.Models.User;
-using Comms_Server.Services.Authentication;
-using Comms_Server.Services.User;
+using Comms_Server.Database.Models;
+using Comms_Server.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,7 +23,7 @@ namespace Comms_Server
 			services.AddScoped<IFactory, Factory>();
 
 			// Identity services
-			services.AddIdentity<AppUser, IdentityRole<Guid>>(options =>
+			services.AddIdentity<User, IdentityRole<Guid>>(options =>
 			{
 				options.Password.RequireDigit = false;
 				options.Password.RequireUppercase = false;

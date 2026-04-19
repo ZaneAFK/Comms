@@ -1,13 +1,12 @@
-using Comms_Server.Database.Models.User;
-using Comms_Server.Services.Authentication;
-using Comms_Server.Services.User;
-using Comms_Server.Shared.Results;
+using Comms_Server.Database.Models;
+using Comms_Server.Services;
+using Comms_Server.Shared;
 using Comms_Server.Testing.Shared;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 
-namespace Comms_Server.Testing.Services.Authentication
+namespace Comms_Server.Testing.Services
 {
 	[TestFixture]
 	public class AuthenticationServiceTest : TransactionalTest
@@ -40,7 +39,7 @@ namespace Comms_Server.Testing.Services.Authentication
 			var mockUserService = new Mock<IUserService>();
 			mockUserService
 				.Setup(x => x.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-				.ReturnsAsync(Result<AppUser>.Failure(new[] { "Registration failed" }));
+				.ReturnsAsync(Result<User>.Failure(new[] { "Registration failed" }));
 
 			var failingAuthenticationService = new AuthenticationService(Factory, mockUserService.Object);
 

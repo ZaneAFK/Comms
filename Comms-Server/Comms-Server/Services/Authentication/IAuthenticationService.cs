@@ -1,6 +1,6 @@
 ﻿using Comms_Server.DTOs;
 
-namespace Comms_Server.Services.Authentication
+namespace Comms_Server.Services
 {
 	public interface IAuthenticationService
 	{

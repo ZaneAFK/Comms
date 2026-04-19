@@ -1,5 +1,5 @@
 ﻿using Comms_Server.Database;
-using Comms_Server.Database.Models.User;
+using Comms_Server.Database.Models;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -23,7 +23,7 @@ namespace Comms_Server.Testing.Shared
 
 		protected async Task AssertAmountOfUsersSaved(int expectedAmount)
 		{
-			var users = (List<AppUser>)await Factory.GetAllAsync<AppUser>();
+			var users = (List<User>)await Factory.GetAllAsync<User>();
 			Assert.AreEqual(expectedAmount, users.Count,
 				$"Expected {expectedAmount} User(s) in the database, but found {users.Count}.");
 		}

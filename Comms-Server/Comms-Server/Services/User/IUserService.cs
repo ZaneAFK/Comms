@@ -1,11 +1,11 @@
-using Comms_Server.Database.Models.User;
-using Comms_Server.Shared.Results;
+using Comms_Server.Database.Models;
+using Comms_Server.Shared;
 
-namespace Comms_Server.Services.User
+namespace Comms_Server.Services
 {
 	public interface IUserService
 	{
-		Task<Result<AppUser>> RegisterUserAsync(string username, string email, string password);
-		Task<AppUser?> GetByIdAsync(Guid id);
+		Task<Result<User>> RegisterUserAsync(string username, string email, string password);
+		Task<User?> GetByIdAsync(Guid id);
 	}
 }

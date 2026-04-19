@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace Comms_Server.Database.Models.User
+namespace Comms_Server.Database.Models
 {
-	public class AppUser : IdentityUser<Guid>
+	public class User : IdentityUser<Guid>
 	{
 		public DateTime CreatedTime { get; set; } = DateTime.UtcNow;
 	}

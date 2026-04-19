@@ -1,4 +1,4 @@
-﻿namespace Comms_Server.Controllers.Authentication
+﻿namespace Comms_Server.Controllers
 {
 	public class AuthenticationController
 	{

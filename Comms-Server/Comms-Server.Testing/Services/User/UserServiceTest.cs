@@ -1,9 +1,9 @@
-using Comms_Server.Services.User;
+using Comms_Server.Services;
 using Comms_Server.Testing.Shared;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
-namespace Comms_Server.Testing.Services.User
+namespace Comms_Server.Testing.Services
 {
 	[TestFixture]
 	public class UserServiceTest : TransactionalTest

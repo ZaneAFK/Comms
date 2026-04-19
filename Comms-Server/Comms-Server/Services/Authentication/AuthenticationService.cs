@@ -1,8 +1,7 @@
 using Comms_Server.Database;
 using Comms_Server.DTOs;
-using Comms_Server.Services.User;
 
-namespace Comms_Server.Services.Authentication
+namespace Comms_Server.Services
 {
 	public class AuthenticationService : Service, IAuthenticationService
 	{
