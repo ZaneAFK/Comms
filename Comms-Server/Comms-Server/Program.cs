@@ -5,30 +5,24 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AttachCommsDatabase(builder.Configuration);
-builder.Services.AddCommsServices();
+builder.Services.AddCommsServices(builder.Configuration);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Apply any pending database migrations on start up
 using (var scope = app.Services.CreateScope())
 {
 	var serviceProvider = scope.ServiceProvider;
 
-	// Apply pending migrations
 	var db = scope.ServiceProvider.GetRequiredService<CommsDbContext>();
 	db.Database.Migrate();
 
-	// Seed roles
 	await Database.SeedRolesAsync(serviceProvider);
 }
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
 	app.UseSwagger();
@@ -36,6 +30,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

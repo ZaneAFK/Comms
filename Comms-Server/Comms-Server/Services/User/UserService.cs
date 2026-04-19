@@ -44,6 +44,23 @@ namespace Comms_Server.Services
 			return Result<User>.Success(user);
 		}
 
+		public async Task<Result<User>> LoginAsync(string email, string password)
+		{
+			var user = await _userManager.FindByEmailAsync(email);
+			if (user is null)
+			{
+				return Result<User>.Failure(["Invalid email or password."]);
+			}
+
+			var passwordValid = await _userManager.CheckPasswordAsync(user, password);
+			if (!passwordValid)
+			{
+				return Result<User>.Failure(["Invalid email or password."]);
+			}
+
+			return Result<User>.Success(user);
+		}
+
 		public async Task<User?> GetByIdAsync(Guid id)
 		{
 			return await _userManager.FindByIdAsync(id.ToString());

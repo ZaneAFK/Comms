@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import Login from '@/views/LoginView.vue'
+import Register from '@/views/RegisterView.vue'
 import Messages from '@/views/MessagesView.vue'
 
 const router = createRouter({
@@ -16,6 +17,11 @@ const router = createRouter({
 			component: Login
 		},
 		{
+			path: '/register',
+			name: 'register',
+			component: Register
+		},
+		{
 			path: '/messages',
 			name: 'messages',
 			component: Messages,
@@ -29,7 +35,7 @@ router.beforeEach((to, from, next) => {
 
 	if (to.meta.requiresAuth && !authStore.isAuthenticated) {
 		next('/login')
-	} else if (to.path === '/login' && authStore.isAuthenticated) {
+	} else if ((to.path === '/login' || to.path === '/register') && authStore.isAuthenticated) {
 		next('/messages')
 	} else {
 		next()
