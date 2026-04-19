@@ -74,5 +74,43 @@ namespace Comms_Server.Testing.Services
 			// Assert
 			Assert.IsNull(foundUser, "GetByIdAsync should return null when the user does not exist.");
 		}
+
+		[Test]
+		public async Task LoginAsync_WithValidCredentials_ReturnsSuccess()
+		{
+			// Arrange
+			await UserService.RegisterUserAsync("TestUser", "testuser@hotmail.com", "supersecure123!");
+
+			// Act
+			var result = await UserService.LoginAsync("testuser@hotmail.com", "supersecure123!");
+
+			// Assert
+			Assert.IsTrue(result.Succeeded, "Login with valid credentials should succeed.");
+			Assert.IsNotNull(result.Value, "Result value should contain the user on success.");
+			Assert.AreEqual("testuser@hotmail.com", result.Value!.Email);
+		}
+
+		[Test]
+		public async Task LoginAsync_WithWrongPassword_ReturnsFailure()
+		{
+			// Arrange
+			await UserService.RegisterUserAsync("TestUser", "testuser@hotmail.com", "supersecure123!");
+
+			// Act
+			var result = await UserService.LoginAsync("testuser@hotmail.com", "wrongpassword");
+
+			// Assert
+			Assert.IsFalse(result.Succeeded, "Login with wrong password should fail.");
+		}
+
+		[Test]
+		public async Task LoginAsync_WithNonExistentEmail_ReturnsFailure()
+		{
+			// Act
+			var result = await UserService.LoginAsync("nobody@hotmail.com", "supersecure123!");
+
+			// Assert
+			Assert.IsFalse(result.Succeeded, "Login with a non-existent email should fail.");
+		}
 	}
 }

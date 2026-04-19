@@ -3,6 +3,10 @@
 		<form @submit.prevent="submit" class="flex flex-col gap-[30px] items-center">
 			<h2 class="text-xl font-semibold">Sign in to your account</h2>
 
+			<p v-if="registered" class="alert alert-info text-sm w-full" role="status">
+				Account created! You can now sign in.
+			</p>
+
 			<label class="block mb-3 w-full">
     	  		<span class="sr-only">Email</span>
     	  		<input v-model="email" type="email" autocomplete="username" required
@@ -26,15 +30,23 @@
     		</button>
 
 			<p v-if="error" class="text-sm text-red-600 mt-3" role="alert" aria-live="polite">{{ error }}</p>
+
+			<p class="text-sm">
+				Don't have an account?
+				<RouterLink to="/register" class="text-blue-600 hover:underline">Create one</RouterLink>
+			</p>
 		</form>
 	</div>
 </template>
 
 <script setup lang="ts">
 	import { Eye, EyeOff } from 'lucide-vue-next'
-	import { ref } from 'vue'
+	import { ref, computed } from 'vue'
 	import { useAuthStore } from '@/stores/auth'
+	import { useRoute } from 'vue-router'
 	import router from '@/router'
+	const route = useRoute()
+	const registered = computed(() => route.query.registered === 'true')
 	const email = ref('')
 	const password = ref('')
 	const show = ref(false)

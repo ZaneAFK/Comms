@@ -1,6 +1,7 @@
-﻿using Comms_Server.Database;
+using Comms_Server.Database;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Comms_Server.Testing.Shared
@@ -12,13 +13,24 @@ namespace Comms_Server.Testing.Shared
 			var connection = new SqliteConnection("DataSource=:memory:");
 			connection.Open();
 
+			var configuration = new ConfigurationBuilder()
+				.AddInMemoryCollection(new Dictionary<string, string?>
+				{
+					{ "Jwt:Key", "test-secret-key-for-unit-tests-minimum-32-chars!" },
+					{ "Jwt:Issuer", "test-issuer" },
+					{ "Jwt:Audience", "test-audience" },
+					{ "Jwt:ExpiryMinutes", "60" }
+				})
+				.Build();
+
 			var services = new ServiceCollection();
 
-			// Override the DbContext to use SQLite in-memory database
+			services.AddSingleton<IConfiguration>(configuration);
+
 			services.AddDbContext<CommsDbContext>(options =>
 				options.UseSqlite(connection));
 
-			services.AddCommsServices();
+			services.AddCommsServices(configuration);
 
 			var provider = services.BuildServiceProvider();
 

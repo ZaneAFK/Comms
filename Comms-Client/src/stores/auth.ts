@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { User, LoginSuccessResponse } from '@/types'
+import type { User, RegisterResponse } from '@/types'
 import { ref, computed } from 'vue'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -16,7 +16,7 @@ export const useAuthStore = defineStore('auth', () => {
 	if (storedToken) token.value = storedToken
 
 	async function login(email: string, password: string) {
-		const res = await fetch('api/login', {
+		const res = await fetch('/api/authentication/login', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ email, password })
@@ -25,16 +25,37 @@ export const useAuthStore = defineStore('auth', () => {
 		const body = await res.json().catch(() => ({}))
 
 		if (!res.ok) {
-			const errorMessage = 'error' in body ? body.error : 'Login failed'
-			return { success: false, error: errorMessage }
+			return { success: false, error: 'Login failed' }
 		}
 
-		const { token: retrievedToken, user: retrievedUser } = body as LoginSuccessResponse
+		if (!body.succeeded) {
+			return { success: false, error: body.error ?? 'Login failed' }
+		}
 
-		token.value = retrievedToken
-		user.value = retrievedUser
-		localStorage.setItem('token', retrievedToken)
-		localStorage.setItem('user', JSON.stringify(retrievedUser))
+		token.value = body.token
+		user.value = body.user
+		localStorage.setItem('token', body.token)
+		localStorage.setItem('user', JSON.stringify(body.user))
+
+		return { success: true }
+	}
+
+	async function register(username: string, email: string, password: string) {
+		const res = await fetch('/api/authentication/register', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ username, email, password })
+		})
+
+		const body = await res.json().catch(() => ({})) as RegisterResponse
+
+		if (!res.ok) {
+			return { success: false, error: 'Registration failed' }
+		}
+
+		if (!body.succeeded) {
+			return { success: false, error: body.error ?? 'Registration failed' }
+		}
 
 		return { success: true }
 	}
@@ -51,6 +72,7 @@ export const useAuthStore = defineStore('auth', () => {
 		token,
 		isAuthenticated,
 		login,
+		register,
 		logout
 	}
 })

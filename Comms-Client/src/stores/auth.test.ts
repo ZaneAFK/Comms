@@ -3,7 +3,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useAuthStore } from '@/stores/auth'
 
 interface MockUser {
-	id: string
 	username: string
 	email: string
 }
@@ -26,11 +25,11 @@ describe('Auth Store', () => {
 		const store = useAuthStore()
 
 		const mockResponse = {
+			succeeded: true,
 			token: 'mock-token',
-			user: { id: '1', username: 'alice', email: 'alice@example.com' }
+			user: { username: 'alice', email: 'alice@example.com' }
 		}
 
-		// Mock fetch to return a successful response
 		vi.stubGlobal('fetch', vi.fn(() =>
 			Promise.resolve({
 				ok: true,
@@ -48,30 +47,92 @@ describe('Auth Store', () => {
 		expect(store.isAuthenticated).toBe(true)
 	})
 
-	it('login returns error when fetch fails', async () => {
+	it('login returns error from body when credentials are invalid', async () => {
 		const store = useAuthStore()
-
-		const mockError = { error: 'Invalid credentials' }
 
 		vi.stubGlobal('fetch', vi.fn(() =>
 			Promise.resolve({
-				ok: false,
-				json: () => Promise.resolve(mockError)
+				ok: true,
+				json: () => Promise.resolve({ succeeded: false, error: 'Invalid email or password.' })
 			} as Response)
 		))
 
 		const result = await store.login('bob@example.com', 'badpassword')
 
 		expect(result.success).toBe(false)
-		expect(result.error).toBe('Invalid credentials')
+		expect(result.error).toBe('Invalid email or password.')
 		expect(store.user).toBeNull()
 		expect(store.token).toBeNull()
 		expect(store.isAuthenticated).toBe(false)
 	})
 
+	it('login returns generic error when request itself fails', async () => {
+		const store = useAuthStore()
+
+		vi.stubGlobal('fetch', vi.fn(() =>
+			Promise.resolve({
+				ok: false,
+				json: () => Promise.resolve({})
+			} as Response)
+		))
+
+		const result = await store.login('bob@example.com', 'badpassword')
+
+		expect(result.success).toBe(false)
+		expect(result.error).toBe('Login failed')
+		expect(store.isAuthenticated).toBe(false)
+	})
+
+	it('register returns success when API succeeds', async () => {
+		const store = useAuthStore()
+
+		vi.stubGlobal('fetch', vi.fn(() =>
+			Promise.resolve({
+				ok: true,
+				json: () => Promise.resolve({ succeeded: true })
+			} as Response)
+		))
+
+		const result = await store.register('alice', 'alice@example.com', 'Password123!')
+
+		expect(result.success).toBe(true)
+	})
+
+	it('register returns error from API body on failure', async () => {
+		const store = useAuthStore()
+
+		vi.stubGlobal('fetch', vi.fn(() =>
+			Promise.resolve({
+				ok: true,
+				json: () => Promise.resolve({ succeeded: false, error: 'Email already taken' })
+			} as Response)
+		))
+
+		const result = await store.register('alice', 'alice@example.com', 'Password123!')
+
+		expect(result.success).toBe(false)
+		expect(result.error).toBe('Email already taken')
+	})
+
+	it('register returns generic error when request itself fails', async () => {
+		const store = useAuthStore()
+
+		vi.stubGlobal('fetch', vi.fn(() =>
+			Promise.resolve({
+				ok: false,
+				json: () => Promise.resolve({})
+			} as Response)
+		))
+
+		const result = await store.register('alice', 'alice@example.com', 'Password123!')
+
+		expect(result.success).toBe(false)
+		expect(result.error).toBe('Registration failed')
+	})
+
 	it('logout clears user, token, and localStorage', async () => {
 		const store = useAuthStore()
-		store.user = { id: '1', username: 'alice', email: 'alice@example.com' }
+		store.user = { username: 'alice', email: 'alice@example.com' }
 		store.token = 'mock-token'
 		localStorage.setItem('user', JSON.stringify(store.user))
 		localStorage.setItem('token', store.token!)

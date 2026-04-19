@@ -1,8 +1,11 @@
+using System.Text;
 using Comms_Server.Database;
 using Comms_Server.Database.Models;
 using Comms_Server.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Comms_Server
 {
@@ -17,7 +20,7 @@ namespace Comms_Server
 			return services;
 		}
 
-		public static IServiceCollection AddCommsServices(this IServiceCollection services)
+		public static IServiceCollection AddCommsServices(this IServiceCollection services, IConfiguration configuration)
 		{
 			// Core database service
 			services.AddScoped<IFactory, Factory>();
@@ -34,9 +37,30 @@ namespace Comms_Server
 				.AddEntityFrameworkStores<CommsDbContext>()
 				.AddDefaultTokenProviders();
 
+			// JWT authentication
+			services.AddAuthentication(options =>
+			{
+				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+				options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+			})
+			.AddJwtBearer(options =>
+			{
+				options.TokenValidationParameters = new TokenValidationParameters
+				{
+					ValidateIssuer = true,
+					ValidateAudience = true,
+					ValidateLifetime = true,
+					ValidateIssuerSigningKey = true,
+					ValidIssuer = configuration["Jwt:Issuer"],
+					ValidAudience = configuration["Jwt:Audience"],
+					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!))
+				};
+			});
+
 			// Application services
 			services.AddScoped<IAuthenticationService, AuthenticationService>();
 			services.AddScoped<IUserService, UserService>();
+			services.AddScoped<IJwtService, JwtService>();
 
 			// Logging
 			services.AddLogging();
