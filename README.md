@@ -4,6 +4,7 @@ Comms is a simple web-based messaging application built with the following tech 
 - **Frontend**: Vue 3, TypeScript, Pinia, Tailwind CSS
 - **Backend**: C# (.NET 8 ASP.NET Web API)
 - **Database**: PostgreSQL
+- **Containerization**: Docker
 
 ---
 
@@ -14,15 +15,23 @@ Thank you for your interest in contributing to Comms!
 This project uses **GitHub Actions** for CI to ensure code quality and integrity.
 Below are the prerequisites and the suggested workflow for development.
 
-### Prequisities
+### Prerequisites
 
-- **.NET SDK 8.0**
-- **Docker** (for running container with database)
+- **Docker** (for running the backend and database)
 - **Node.js** (for frontend development)
 
 > Any IDE or editor that supports the relevant tooling can be used.
 
 ---
+
+### Backend & Database Setup
+
+The backend and database both run in Docker containers.
+
+1. Create a `.env` file based on `.env.template` and fill in the required variables
+2. Start the containers:
+   - `docker compose up -d postgres backend`
+3. The backend runs with hot reload via `dotnet watch` — changes to the source are picked up automatically
 
 ### Frontend - Suggested Setup
 
@@ -35,19 +44,19 @@ Below are the prerequisites and the suggested workflow for development.
    - Stylelint
 2. Install dependencies:
    - Run `npm install`
-3. Start the development server
+3. Start the development server:
    - Run `npm run dev`
-### Backend - Suggested Setup
-1. Ensure **.NET SDK 8.0** and **Docker** is installed
-2. Create a `.env` file based on `.env.template` and fill in the required variables
-3. Create an `appsettings.Development.json` file in `Comms-Server/Comms-Server/` based on `appsettings.Development.json.template` and fill in your database credentials
-4. Start the Postgres database using Docker Compose:
-   - `docker compose up -d`
-5. Run the backend
-6. If you make changes that update the database schema, create a new migration:
-   - `dotnet ef migrations add CommsDb_<Migration_Number>`
-   - Replace <Migration_Number> with the latest migration identifier
-   - E.g `dotnet ef migrations add CommsDb_6`
+4. The Vite dev server proxies `/api` and `/hubs` to the backend container automatically
+
+### Database Migrations
+
+If you make changes that update the database schema, create a new migration:
+
+```
+dotnet ef migrations add CommsDb_<Migration_Number>
+```
+
+Replace `<Migration_Number>` with the next migration number (e.g. `CommsDb_6`).
 ## Suggested Workflow
 1. Fork the repository
 1. Create a feature branch on your fork

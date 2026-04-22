@@ -8,28 +8,27 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
 
-    ports:
-      - "${DATABASE_PORT}:5432"
-
     volumes:
       - comms_postgres_data:/var/lib/postgresql/data
 
-  # Uncomment when the backend is containerized.
-  # backend:
-  #   build: ./Comms-Server
-  #   environment:
-  #     ASPNETCORE_ENVIRONMENT: Production
-  #     ConnectionStrings__Default: "Host=postgres;Database=${DATABASE_NAME};Username=${DATABASE_USER};Password=${DATABASE_PASSWORD};Port=5432"
-  #   depends_on:
-  #     - postgres
+  backend:
+    build: ./Comms-Server
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Default: "Host=postgres;Database=${DATABASE_NAME};Username=${DATABASE_USER};Password=${DATABASE_PASSWORD};Port=5432"
+      Jwt__Key: ${JWT_KEY}
+    depends_on:
+      - postgres
 
-  # Uncomment when the frontend is containerized.
-  # frontend:
-  #   build: ./Comms-Client
-  #   ports:
-  #     - "80:80"
-  #   depends_on:
-  #     - backend
+  frontend:
+    build: ./Comms-Client
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
 
 volumes:
   comms_postgres_data:

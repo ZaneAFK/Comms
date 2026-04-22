@@ -1,0 +1,15 @@
+services:
+  postgres:
+    ports:
+      - "${DATABASE_PORT}:5432"
+
+  backend:
+    build:
+      context: ./Comms-Server
+      target: dev
+    ports:
+      - "${BACKEND_PORT:-5177}:8080"
+    volumes:
+      - ./Comms-Server:/src
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
