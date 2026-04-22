@@ -1,4 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Comms_Server.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -44,7 +43,7 @@ namespace Comms_Server.Hubs
 		public async Task StartTyping(Guid conversationId)
 		{
 			var userId = GetUserId();
-			var username = Context.User?.FindFirst(JwtRegisteredClaimNames.UniqueName)?.Value ?? "Unknown";
+			var username = Context.User?.FindFirst(ClaimTypes.Name)?.Value ?? "Unknown";
 			await Clients.OthersInGroup(conversationId.ToString())
 				.SendAsync("UserTyping", new { ConversationId = conversationId, UserId = userId, Username = username });
 		}
