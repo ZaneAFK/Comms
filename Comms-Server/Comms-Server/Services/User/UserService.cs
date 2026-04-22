@@ -1,7 +1,9 @@
 using Comms_Server.Database;
 using Comms_Server.Database.Models;
+using Comms_Server.DTOs;
 using Comms_Server.Shared;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Comms_Server.Services
 {
@@ -64,6 +66,19 @@ namespace Comms_Server.Services
 		public async Task<User?> GetByIdAsync(Guid id)
 		{
 			return await _userManager.FindByIdAsync(id.ToString());
+		}
+
+		public async Task<IEnumerable<UserSearchDto>> SearchUsersAsync(string username)
+		{
+			return await _userManager.Users
+				.Where(u => u.UserName != null && u.UserName.Contains(username))
+				.Take(10)
+				.Select(u => new UserSearchDto
+				{
+					Id = u.Id,
+					Username = u.UserName!
+				})
+				.ToListAsync();
 		}
 	}
 }

@@ -55,12 +55,45 @@ namespace Comms_Server
 					ValidAudience = configuration["Jwt:Audience"],
 					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!))
 				};
+
+				// Allow token via query string for SignalR WebSocket connections
+				options.Events = new JwtBearerEvents
+				{
+					OnMessageReceived = context =>
+					{
+						var accessToken = context.Request.Query["access_token"];
+						var path = context.HttpContext.Request.Path;
+						if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+						{
+							context.Token = accessToken;
+						}
+						return Task.CompletedTask;
+					}
+				};
 			});
+
+			// CORS
+			services.AddCors(options =>
+			{
+				options.AddPolicy("CorsPolicy", policy =>
+				{
+					policy
+						.WithOrigins("http://localhost:5173")
+						.AllowAnyHeader()
+						.AllowAnyMethod()
+						.AllowCredentials();
+				});
+			});
+
+			// SignalR
+			services.AddSignalR();
 
 			// Application services
 			services.AddScoped<IAuthenticationService, AuthenticationService>();
 			services.AddScoped<IUserService, UserService>();
 			services.AddScoped<IJwtService, JwtService>();
+			services.AddScoped<IConversationService, ConversationService>();
+			services.AddScoped<IMessageService, MessageService>();
 
 			// Logging
 			services.AddLogging();

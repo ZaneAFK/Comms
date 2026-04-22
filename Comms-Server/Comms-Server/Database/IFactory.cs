@@ -7,6 +7,7 @@ namespace Comms_Server.Database
 	{
 		Task<T?> GetAsync<T>(Guid id) where T : class;
 		Task<IEnumerable<T>> GetAllAsync<T>() where T : class;
+		IQueryable<T> Query<T>() where T : class;
 		Task<bool> ExistsAsync<T>(Expression<Func<T, bool>> predicate) where T : class;
 		Task AddAsync<T>(T entity) where T : class;
 		T New<T>() where T : class, new();

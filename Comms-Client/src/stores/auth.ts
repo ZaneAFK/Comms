@@ -5,7 +5,7 @@ import { ref, computed } from 'vue'
 export const useAuthStore = defineStore('auth', () => {
 	const user = ref<User | null>(null)
 	const token = ref<string | null>(null)
-	// bypassAuth IS DEV ONLY, REMOVE FLAG FOR PRODUCTION
+	// TODO: bypassAuth IS DEV ONLY, REMOVE FLAG FOR PRODUCTION
 	const isAuthenticated = computed(() => !!token.value || (import.meta.env.DEV && localStorage.getItem('bypassAuth') === 'true'))
 
 	// Initialize from localStorage
@@ -65,6 +65,8 @@ export const useAuthStore = defineStore('auth', () => {
 		token.value = null
 		localStorage.removeItem('user')
 		localStorage.removeItem('token')
+		// TODO: Remove below line when done with testing.
+		localStorage.removeItem('bypassAuth')
 	}
 
 	return {
