@@ -7,9 +7,9 @@ namespace Comms_Server.Database
 {
 	public class CommsDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
 	{
-		public DbSet<Conversation> Conversations { get; set; }
-		public DbSet<ConversationMember> ConversationMembers { get; set; }
-		public DbSet<Message> Messages { get; set; }
+		public DbSet<Conversation> Conversations { get; set; } = null!;
+		public DbSet<ConversationMember> ConversationMembers { get; set; } = null!;
+		public DbSet<Message> Messages { get; set; } = null!;
 
 		public CommsDbContext(DbContextOptions<CommsDbContext> options)
 			: base(options)
