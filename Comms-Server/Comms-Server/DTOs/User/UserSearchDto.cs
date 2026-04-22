@@ -1,8 +1,8 @@
 namespace Comms_Server.DTOs
 {
-	public class UserDto
+	public class UserSearchDto
 	{
+		public Guid Id { get; set; }
 		public string Username { get; set; } = null!;
-		public string Email { get; set; } = null!;
 	}
 }

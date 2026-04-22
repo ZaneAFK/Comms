@@ -35,6 +35,17 @@ namespace Comms_Server.Database
 		}
 
 		/// <summary>
+		/// Returns an <see cref="IQueryable{T}"/> for the given entity type, allowing
+		/// filtered, ordered, and projected queries to be composed and executed against the database.
+		/// </summary>
+		/// <typeparam name="T">Entity type.</typeparam>
+		/// <returns>An <see cref="IQueryable{T}"/> scoped to the entity set.</returns>
+		public IQueryable<T> Query<T>() where T : class
+		{
+			return _context.Set<T>();
+		}
+
+		/// <summary>
 		/// Determines whether any entity of type <typeparamref name="T"/> exists in the database
 		/// that satisfies the specified predicate.
 		/// </summary>
