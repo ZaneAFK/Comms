@@ -9,14 +9,18 @@ namespace Comms_Server.Services
 	public class JwtService : IJwtService
 	{
 		private readonly IConfiguration _configuration;
+		private readonly ILogger<JwtService> _logger;
 
-		public JwtService(IConfiguration configuration)
+		public JwtService(IConfiguration configuration, ILogger<JwtService> logger)
 		{
 			_configuration = configuration;
+			_logger = logger;
 		}
 
 		public string GenerateToken(User user)
 		{
+			_logger.LogDebug("Generating JWT token for user {UserId}", user.Id);
+
 			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
 			var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 

@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:latest
+    image: postgres:17
     restart: unless-stopped
 
     environment:
@@ -10,6 +10,15 @@ services:
 
     volumes:
       - comms_postgres_data:/var/lib/postgresql/data
+
+  seq:
+    image: datalust/seq:2025.1
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: Y
+      SEQ_FIRSTRUN_ADMINPASSWORD: ${SEQ_ADMIN_PASSWORD}
+    volumes:
+      - comms_seq_data:/data
 
   backend:
     build: ./Comms-Server
@@ -21,6 +30,7 @@ services:
       Jwt__Key: ${JWT_KEY}
     depends_on:
       - postgres
+      - seq
 
   frontend:
     build: ./Comms-Client
@@ -32,3 +42,4 @@ services:
 
 volumes:
   comms_postgres_data:
+  comms_seq_data:
