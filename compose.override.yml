@@ -1,14 +1,4 @@
 services:
-  postgres:
-    ports:
-      - "${DATABASE_PORT}:5432"
-
-  seq:
-    ports:
-      - "5341:80"
-    environment:
-      SEQ_FIRSTRUN_NOAUTHENTICATION: true
-
   backend:
     build:
       context: ./Comms-Server
@@ -19,4 +9,13 @@ services:
       - ./Comms-Server:/src
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      Serilog__WriteTo__1__Args__serverUrl: http://seq
+
+  postgres:
+    ports:
+      - "${DATABASE_PORT}:5432"
+    
+  seq:
+    ports:
+      - "5341:80"
+    environment:
+      SEQ_FIRSTRUN_NOAUTHENTICATION: true

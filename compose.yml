@@ -1,4 +1,25 @@
 services:
+  frontend:
+    build: ./Comms-Client
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - seq
+
+  backend:
+    build: ./Comms-Server
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Default: "Host=postgres;Database=${DATABASE_NAME};Username=${DATABASE_USER};Password=${DATABASE_PASSWORD};Port=5432"
+      Jwt__Key: ${JWT_KEY}
+    depends_on:
+      - postgres
+      - seq
+
   postgres:
     image: postgres:17
     restart: unless-stopped
@@ -19,26 +40,6 @@ services:
       SEQ_FIRSTRUN_ADMINPASSWORD: ${SEQ_ADMIN_PASSWORD}
     volumes:
       - comms_seq_data:/data
-
-  backend:
-    build: ./Comms-Server
-    restart: unless-stopped
-    environment:
-      ASPNETCORE_ENVIRONMENT: Production
-      ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__Default: "Host=postgres;Database=${DATABASE_NAME};Username=${DATABASE_USER};Password=${DATABASE_PASSWORD};Port=5432"
-      Jwt__Key: ${JWT_KEY}
-    depends_on:
-      - postgres
-      - seq
-
-  frontend:
-    build: ./Comms-Client
-    restart: unless-stopped
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
 
 volumes:
   comms_postgres_data:

@@ -58,14 +58,14 @@ namespace Comms_Server.Services
 			var user = await _userManager.FindByEmailAsync(email);
 			if (user is null)
 			{
-				Logger.LogDebug("No account found for email '{Email}'", email);
+				Logger.LogDebug("Login failed for email '{Email}'", email);
 				return Result<User>.Failure(["Invalid email or password."]);
 			}
 
 			var passwordValid = await _userManager.CheckPasswordAsync(user, password);
 			if (!passwordValid)
 			{
-				Logger.LogDebug("Incorrect password supplied for email '{Email}'", email);
+				Logger.LogDebug("Login failed for email '{Email}'", email);
 				return Result<User>.Failure(["Invalid email or password."]);
 			}
 

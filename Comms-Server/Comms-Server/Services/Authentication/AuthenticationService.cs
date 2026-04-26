@@ -42,7 +42,7 @@ namespace Comms_Server.Services
 
 			if (!result.Succeeded)
 			{
-				Logger.LogWarning("Login failed for email '{Email}': {Errors}", email, string.Join(" ", result.Errors));
+				Logger.LogInformation("Login failed for email '{Email}': {Errors}", email, string.Join(" ", result.Errors));
 				return new LoginUserResponse
 				{
 					Succeeded = false,
