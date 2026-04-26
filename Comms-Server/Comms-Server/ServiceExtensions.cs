@@ -1,11 +1,13 @@
 using System.Text;
 using Comms_Server.Database;
 using Comms_Server.Database.Models;
+using Comms_Server.Hubs;
 using Comms_Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 
 namespace Comms_Server
 {
@@ -20,7 +22,7 @@ namespace Comms_Server
 			return services;
 		}
 
-		public static IServiceCollection AddCommsServices(this IServiceCollection services, IConfiguration configuration)
+		public static IServiceCollection AddCommsServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment? environment = null)
 		{
 			// Core database service
 			services.AddScoped<IFactory, Factory>();
@@ -85,8 +87,15 @@ namespace Comms_Server
 				});
 			});
 
-			// SignalR
+			// APIs
 			services.AddSignalR();
+			services.AddControllers();
+
+			if (environment?.IsDevelopment() == true)
+			{
+				services.AddEndpointsApiExplorer();
+				services.AddSwaggerGen();
+			}
 
 			// Application services
 			services.AddScoped<IAuthenticationService, AuthenticationService>();
@@ -99,6 +108,31 @@ namespace Comms_Server
 			services.AddLogging();
 
 			return services;
+		}
+
+		public static WebApplication UseCommsMiddleware(this WebApplication app)
+		{
+			if (app.Environment.IsDevelopment())
+			{
+				app.UseSwagger();
+				app.UseSwaggerUI();
+			}
+
+			app.UseHttpsRedirection();
+			app.UseCors("CorsPolicy");
+			app.UseSerilogRequestLogging();
+			app.UseAuthentication();
+			app.UseAuthorization();
+
+			return app;
+		}
+
+		public static WebApplication MapCommsEndpoints(this WebApplication app)
+		{
+			app.MapControllers();
+			app.MapHub<ChatHub>("/hubs/chat");
+
+			return app;
 		}
 	}
 }

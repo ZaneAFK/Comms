@@ -4,6 +4,7 @@ Comms is a simple web-based messaging application built with the following tech 
 - **Frontend**: Vue 3, TypeScript, Pinia, Tailwind CSS
 - **Backend**: C# (.NET 8 ASP.NET Web API)
 - **Database**: PostgreSQL
+- **Logging**: Serilog + Seq
 - **Containerization**: Docker
 
 ---
@@ -30,8 +31,10 @@ The backend and database both run in Docker containers.
 
 1. Create a `.env` file based on `.env.template` and fill in the required variables
 2. Start the containers:
-   - `docker compose up -d postgres backend`
+   - `docker compose up -d backend`
+   - This also starts `postgres` and `seq` automatically
 3. The backend runs with hot reload via `dotnet watch` — changes to the source are picked up automatically
+4. Structured logs are viewable in Seq at `http://localhost:5341`
 
 ### Frontend - Suggested Setup
 

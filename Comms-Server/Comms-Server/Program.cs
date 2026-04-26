@@ -1,16 +1,15 @@
 using Comms_Server;
 using Comms_Server.Database;
-using Comms_Server.Hubs;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AttachCommsDatabase(builder.Configuration);
-builder.Services.AddCommsServices(builder.Configuration);
+builder.Host.UseSerilog((context, configuration) =>
+	configuration.ReadFrom.Configuration(context.Configuration));
 
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AttachCommsDatabase(builder.Configuration);
+builder.Services.AddCommsServices(builder.Configuration, builder.Environment);
 
 var app = builder.Build();
 
@@ -24,17 +23,7 @@ using (var scope = app.Services.CreateScope())
 	await Database.SeedRolesAsync(serviceProvider);
 }
 
-if (app.Environment.IsDevelopment())
-{
-	app.UseSwagger();
-	app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-app.UseCors("CorsPolicy");
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapControllers();
-app.MapHub<ChatHub>("/hubs/chat");
+app.UseCommsMiddleware();
+app.MapCommsEndpoints();
 
 app.Run();

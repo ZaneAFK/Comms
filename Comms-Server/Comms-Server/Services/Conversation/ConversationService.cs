@@ -6,14 +6,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Comms_Server.Services
 {
-	public class ConversationService : Service, IConversationService
+	public class ConversationService : Service<ConversationService>, IConversationService
 	{
-		public ConversationService(IFactory factory) : base(factory)
+		public ConversationService(IFactory factory, ILogger<ConversationService> logger) : base(factory, logger)
 		{
 		}
 
 		public async Task<IEnumerable<ConversationDto>> GetUserConversationsAsync(Guid userId)
 		{
+			Logger.LogDebug("Retrieving conversations for user {UserId}", userId);
+
 			var conversations = await Factory.Query<ConversationMember>()
 				.Where(cm => cm.UserId == userId)
 				.Include(cm => cm.Conversation)
@@ -27,9 +29,11 @@ namespace Comms_Server.Services
 
 		public async Task<ConversationDto?> CreateConversationAsync(string name, List<Guid> memberIds, Guid creatorId)
 		{
+			var allMemberIds = memberIds.Union([creatorId]).Distinct().ToList();
+			Logger.LogInformation("Creating conversation '{Name}' with {MemberCount} member(s)", name, allMemberIds.Count);
+
 			using var transaction = await Factory.BeginTransactionAsync();
 
-			var allMemberIds = memberIds.Union([creatorId]).Distinct().ToList();
 			var conversation = CreateConversationAndLinkToMembers(name, allMemberIds);
 
 			await Factory.SaveAsync();
@@ -42,9 +46,11 @@ namespace Comms_Server.Services
 
 			if (created == null)
 			{
+				Logger.LogWarning("Conversation '{Name}' was saved but could not be retrieved (ID: {ConversationId})", name, conversation.Id);
 				return null;
 			}
 
+			Logger.LogInformation("Conversation '{Name}' created with ID {ConversationId}", created.Name, created.Id);
 			return new ConversationDto
 			{
 				Id = created.Id,

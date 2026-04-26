@@ -1,15 +1,12 @@
 services:
-  postgres:
-    image: postgres:latest
+  frontend:
+    build: ./Comms-Client
     restart: unless-stopped
-
-    environment:
-      POSTGRES_USER: ${DATABASE_USER}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      POSTGRES_DB: ${DATABASE_NAME}
-
-    volumes:
-      - comms_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - seq
 
   backend:
     build: ./Comms-Server
@@ -21,14 +18,29 @@ services:
       Jwt__Key: ${JWT_KEY}
     depends_on:
       - postgres
+      - seq
 
-  frontend:
-    build: ./Comms-Client
+  postgres:
+    image: postgres:17
     restart: unless-stopped
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
+
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+
+    volumes:
+      - comms_postgres_data:/var/lib/postgresql/data
+
+  seq:
+    image: datalust/seq:2025.1
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: Y
+      SEQ_FIRSTRUN_ADMINPASSWORD: ${SEQ_ADMIN_PASSWORD}
+    volumes:
+      - comms_seq_data:/data
 
 volumes:
   comms_postgres_data:
+  comms_seq_data:
