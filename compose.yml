@@ -17,18 +17,23 @@ services:
       ConnectionStrings__Default: "Host=postgres;Database=${DATABASE_NAME};Username=${DATABASE_USER};Password=${DATABASE_PASSWORD};Port=5432"
       Jwt__Key: ${JWT_KEY}
     depends_on:
-      - postgres
-      - seq
+      postgres:
+        condition: service_healthy
+      seq:
+        condition: service_started
 
   postgres:
     image: postgres:17
     restart: unless-stopped
-
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     environment:
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
-
     volumes:
       - comms_postgres_data:/var/lib/postgresql/data
 
