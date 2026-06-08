@@ -16,8 +16,7 @@ export default defineConfigWithVueTs(
 		rules: {
 			'indent': ['error', 'tab'],
 			'vue/html-indent': ['error', 'tab'],
-			'vue/script-indent': ['error', 'tab', { baseIndent: 0 }],
-			'vue/style-indent': ['error', 'tab']
+			'vue/script-indent': ['error', 'tab', { baseIndent: 0 }]
 		}
 	},
 

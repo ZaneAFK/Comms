@@ -50,41 +50,41 @@
 </template>
 
 <script setup lang="ts">
-	import { Eye, EyeOff } from 'lucide-vue-next'
-	import { ref } from 'vue'
-	import { useAuthStore } from '@/stores/auth'
-	import router from '@/router'
+import { Eye, EyeOff } from 'lucide-vue-next'
+import { ref } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import router from '@/router'
 
-	const username = ref('')
-	const email = ref('')
-	const password = ref('')
-	const confirmPassword = ref('')
-	const show = ref(false)
-	const loading = ref(false)
-	const error = ref('')
-	const authStore = useAuthStore()
+const username = ref('')
+const email = ref('')
+const password = ref('')
+const confirmPassword = ref('')
+const show = ref(false)
+const loading = ref(false)
+const error = ref('')
+const authStore = useAuthStore()
 
-	async function submit() {
-		if (password.value !== confirmPassword.value) {
-			error.value = 'Passwords do not match.'
+async function submit() {
+	if (password.value !== confirmPassword.value) {
+		error.value = 'Passwords do not match.'
+		return
+	}
+
+	loading.value = true
+	error.value = ''
+
+	try {
+		const result = await authStore.register(username.value, email.value, password.value)
+
+		if (!result.success) {
+			error.value = result.error ?? 'Registration failed.'
 			return
 		}
 
-		loading.value = true
-		error.value = ''
-
-		try {
-			const result = await authStore.register(username.value, email.value, password.value)
-
-			if (!result.success) {
-				error.value = result.error ?? 'Registration failed.'
-				return
-			}
-
-			router.push('/login?registered=true')
-		}
-		finally {
-			loading.value = false
-		}
+		router.push('/login?registered=true')
 	}
+	finally {
+		loading.value = false
+	}
+}
 </script>
