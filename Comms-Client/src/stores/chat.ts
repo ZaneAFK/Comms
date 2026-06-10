@@ -1,14 +1,22 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import * as signalR from '@microsoft/signalr'
 import type { ConversationDto, MessageDto, UserSearchResult, TypingUser } from '@/types'
 
 export const useChatStore = defineStore('chat', () => {
 	const connection = ref<signalR.HubConnection | null>(null)
+
 	const conversations = ref<ConversationDto[]>([])
 	const messages = ref<Map<string, MessageDto[]>>(new Map())
 	const typingUsers = ref<Map<string, TypingUser[]>>(new Map())
+
 	const activeConversationId = ref<string | null>(null)
+	const activeConversation = computed(() =>
+		conversations.value.find(c => c.id === activeConversationId.value) ?? null
+	)
+	const activeMessages = computed(() =>
+		activeConversationId.value ? getMessages(activeConversationId.value) : []
+	)
 
 	async function connect(token: string) {
 		if (connection.value) return
@@ -101,6 +109,13 @@ export const useChatStore = defineStore('chat', () => {
 		return conv
 	}
 
+	async function selectConversation(id: string, token: string) {
+		setActiveConversation(id)
+		if (!getMessages(id).length) {
+			await loadMessages(id, token)
+		}
+	}
+
 	async function searchUsers(username: string, token: string): Promise<UserSearchResult[]> {
 		const res = await fetch(`/api/users/search?username=${encodeURIComponent(username)}`, {
 			headers: { Authorization: `Bearer ${token}` }
@@ -122,9 +137,10 @@ export const useChatStore = defineStore('chat', () => {
 	}
 
 	return {
-		connection,
 		conversations,
 		activeConversationId,
+		activeConversation,
+		activeMessages,
 		connect,
 		disconnect,
 		loadConversations,
@@ -133,6 +149,7 @@ export const useChatStore = defineStore('chat', () => {
 		startTyping,
 		stopTyping,
 		createConversation,
+		selectConversation,
 		searchUsers,
 		getMessages,
 		getTypingUsers,

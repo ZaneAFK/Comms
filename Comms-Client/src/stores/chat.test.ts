@@ -73,9 +73,8 @@ beforeEach(() => {
 
 describe('Chat Store', () => {
 	describe('initial state', () => {
-		it('has no connection, empty conversations, and no active conversation', () => {
+		it('has empty conversations and no active conversation', () => {
 			const store = useChatStore()
-			expect(store.connection).toBeNull()
 			expect(store.conversations).toEqual([])
 			expect(store.activeConversationId).toBeNull()
 		})
@@ -86,7 +85,6 @@ describe('Chat Store', () => {
 			const store = useChatStore()
 			await store.connect(TOKEN)
 			expect(mockHub.start).toHaveBeenCalledOnce()
-			expect(store.connection).not.toBeNull()
 		})
 
 		it('registers ReceiveMessage, UserTyping, and UserStoppedTyping handlers', async () => {
@@ -111,7 +109,6 @@ describe('Chat Store', () => {
 			await store.connect(TOKEN)
 			await store.disconnect()
 			expect(mockHub.stop).toHaveBeenCalledOnce()
-			expect(store.connection).toBeNull()
 		})
 
 		it('does nothing when not connected', async () => {
@@ -261,6 +258,73 @@ describe('Chat Store', () => {
 		it('returns an empty array for an unknown conversation', () => {
 			const store = useChatStore()
 			expect(store.getTypingUsers('unknown')).toEqual([])
+		})
+	})
+
+	describe('activeConversation', () => {
+		it('returns null when no active conversation ID is set', () => {
+			const store = useChatStore()
+			expect(store.activeConversation).toBeNull()
+		})
+
+		it('returns the matching conversation when an active ID is set', () => {
+			const store = useChatStore()
+			const conv = makeConversation()
+			store.conversations.push(conv)
+			store.setActiveConversation('conv-1')
+			expect(store.activeConversation).toEqual(conv)
+		})
+
+		it('returns null when the active ID does not match any conversation', () => {
+			const store = useChatStore()
+			store.setActiveConversation('unknown')
+			expect(store.activeConversation).toBeNull()
+		})
+	})
+
+	describe('activeMessages', () => {
+		it('returns an empty array when no active conversation ID is set', () => {
+			const store = useChatStore()
+			expect(store.activeMessages).toEqual([])
+		})
+
+		it('returns messages for the active conversation', async () => {
+			const store = useChatStore()
+			const msgs = [makeMessage()]
+			vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+				ok: true,
+				json: () => Promise.resolve(msgs),
+			}))
+			await store.loadMessages('conv-1', TOKEN)
+			store.setActiveConversation('conv-1')
+			expect(store.activeMessages).toEqual(msgs)
+		})
+	})
+
+	describe('selectConversation', () => {
+		it('sets the active conversation and loads its messages', async () => {
+			const store = useChatStore()
+			const msgs = [makeMessage()]
+			vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+				ok: true,
+				json: () => Promise.resolve(msgs),
+			}))
+			await store.selectConversation('conv-1', TOKEN)
+			expect(store.activeConversationId).toBe('conv-1')
+			expect(store.getMessages('conv-1')).toEqual(msgs)
+		})
+
+		it('does not reload messages if already loaded', async () => {
+			const store = useChatStore()
+			const fetchMock = vi.fn().mockResolvedValue({
+				ok: true,
+				json: () => Promise.resolve([makeMessage()]),
+			})
+			vi.stubGlobal('fetch', fetchMock)
+			await store.loadMessages('conv-1', TOKEN)
+			const callsBefore = fetchMock.mock.calls.length
+			await store.selectConversation('conv-1', TOKEN)
+			expect(fetchMock.mock.calls.length).toBe(callsBefore)
 		})
 	})
 

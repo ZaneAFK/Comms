@@ -8,26 +8,26 @@
 			</p>
 
 			<label class="block mb-3 w-full">
-    	  		<span class="sr-only">Email</span>
-    	  		<input v-model="email" type="email" autocomplete="username" required
-    	        class="w-full p-2 border rounded" placeholder="you@example.com" />
-    		</label>
+				<span class="sr-only">Email</span>
+				<input v-model="email" type="email" autocomplete="username" required
+					class="w-full p-2 border rounded" placeholder="you@example.com" />
+			</label>
 
 			<label class="block mb-3 w-full">
-    	  		<span class="sr-only">Password</span>
-    	  		<div class="relative w-full">
-    	    		<input v-model="password" :type="show ? 'text' : 'password'" autocomplete="current-password" required
-    	           	class="w-full p-2 border rounded pr-10" placeholder="Password" />
-    	    		<button type="button" @click="show = !show">
+				<span class="sr-only">Password</span>
+				<div class="relative w-full">
+					<input v-model="password" :type="show ? 'text' : 'password'" autocomplete="current-password" required
+						class="w-full p-2 border rounded pr-10" placeholder="Password" />
+					<button type="button" @click="show = !show">
 						<Eye v-if="show" :size="15" />
 						<EyeOff v-else :size="15"/>
-    	    		</button>
-    	  		</div>
-    		</label>
+					</button>
+				</div>
+			</label>
 
 			<button type="submit" v-on:click="submit" :disabled="loading" class="btn-primary text-white p-2 rounded">
-    	  		<span v-if="loading">Signing in…</span><span v-else>Sign in</span>
-    		</button>
+				<span v-if="loading">Signing in…</span><span v-else>Sign in</span>
+			</button>
 
 			<p v-if="error" class="text-sm text-red-600 mt-3" role="alert" aria-live="polite">{{ error }}</p>
 
@@ -40,36 +40,36 @@
 </template>
 
 <script setup lang="ts">
-	import { Eye, EyeOff } from 'lucide-vue-next'
-	import { ref, computed } from 'vue'
-	import { useAuthStore } from '@/stores/auth'
-	import { useRoute } from 'vue-router'
-	import router from '@/router'
-	const route = useRoute()
-	const registered = computed(() => route.query.registered === 'true')
-	const email = ref('')
-	const password = ref('')
-	const show = ref(false)
-	const loading = ref(false)
-	const error = ref('')
-	const authStore = useAuthStore()
+import { Eye, EyeOff } from 'lucide-vue-next'
+import { ref, computed } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { useRoute } from 'vue-router'
+import router from '@/router'
+const route = useRoute()
+const registered = computed(() => route.query.registered === 'true')
+const email = ref('')
+const password = ref('')
+const show = ref(false)
+const loading = ref(false)
+const error = ref('')
+const authStore = useAuthStore()
 
-	async function submit() {
-		loading.value = true
-		error.value = ''
+async function submit() {
+	loading.value = true
+	error.value = ''
 
-		try {
-			const result = await authStore.login(email.value, password.value)
+	try {
+		const result = await authStore.login(email.value, password.value)
 
-			if (!result.success) {
-				error.value = result.error
-				return
-			}
-
-			router.push('/messages')
+		if (!result.success) {
+			error.value = result.error
+			return
 		}
-		finally {
-			loading.value = false
-		}
+
+		router.push('/messages')
 	}
+	finally {
+		loading.value = false
+	}
+}
 </script>

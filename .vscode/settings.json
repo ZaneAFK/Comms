@@ -1,0 +1,9 @@
+{
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": "explicit"
+	},
+	"eslint.workingDirectories": [
+		"./Comms-Client"
+	],
+	"eslint.validate": ["javascript", "typescript", "vue"]
+}
