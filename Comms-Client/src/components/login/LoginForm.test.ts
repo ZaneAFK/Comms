@@ -31,7 +31,7 @@ function mountForm() {
 
 beforeEach(() => {
 	vi.clearAllMocks()
-	vi.mocked(useRoute).mockReturnValue({ query: {} } as ReturnType<typeof useRoute>)
+	vi.mocked(useRoute).mockReturnValue({ query: {} } as unknown as ReturnType<typeof useRoute>)
 	mockAuthStore = {
 		login: vi.fn().mockResolvedValue({ success: true }),
 	}
@@ -39,7 +39,7 @@ beforeEach(() => {
 
 describe('LoginForm', () => {
 	it('shows the registration success banner when ?registered=true', () => {
-		vi.mocked(useRoute).mockReturnValue({ query: { registered: 'true' } } as ReturnType<typeof useRoute>)
+		vi.mocked(useRoute).mockReturnValue({ query: { registered: 'true' } } as unknown as ReturnType<typeof useRoute>)
 		const wrapper = mountForm()
 		expect(wrapper.find('[role="status"]').exists()).toBe(true)
 	})
