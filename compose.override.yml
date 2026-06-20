@@ -1,19 +1,10 @@
-services:
-  backend:
-    build:
-      context: ./Comms-Server
-      target: dev
-    ports:
-      - "${BACKEND_PORT:-5177}:8080"
-    volumes:
-      - ./Comms-Server:/src
-    environment:
-      ASPNETCORE_ENVIRONMENT: Development
+# Local development only. Auto-merged by `docker compose up`
 
+services:
   postgres:
     ports:
-      - "${DATABASE_PORT}:5432"
-    
+      - "5432:5432"
+
   seq:
     ports:
       - "5341:80"

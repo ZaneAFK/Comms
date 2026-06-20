@@ -75,12 +75,13 @@ namespace Comms_Server
 			});
 
 			// CORS
+			var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
 			services.AddCors(options =>
 			{
 				options.AddPolicy("CorsPolicy", policy =>
 				{
 					policy
-						.WithOrigins("http://localhost:5173")
+						.WithOrigins(allowedOrigins)
 						.AllowAnyHeader()
 						.AllowAnyMethod()
 						.AllowCredentials();
