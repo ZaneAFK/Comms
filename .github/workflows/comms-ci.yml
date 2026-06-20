@@ -1,6 +1,7 @@
 name: Comms CI
 
 on:
+  workflow_call:
   pull_request:
     branches: [master]
     types:
@@ -11,7 +12,7 @@ jobs:
   frontend:
     name: Frontend CI
     runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
+    if: github.event_name == 'workflow_call' || github.event.pull_request.draft == false
     steps:
         - name: Checkout repository
           uses: actions/checkout@v3
@@ -45,7 +46,7 @@ jobs:
   backend:
     name: Backend CI
     runs-on: windows-latest
-    if: github.event.pull_request.draft == false
+    if: github.event_name == 'workflow_call' || github.event.pull_request.draft == false
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3

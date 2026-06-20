@@ -1,20 +1,29 @@
 services:
-  frontend:
-    build: ./Comms-Client
+  nginx:
+    image: nginx:1.27-alpine
     restart: unless-stopped
     ports:
       - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - frontend
+      - backend
+
+  frontend:
+    image: ghcr.io/zaneafk/comms-client:${COMMS_VERSION:-latest}
+    restart: unless-stopped
     depends_on:
       - backend
       - seq
 
   backend:
-    build: ./Comms-Server
+    image: ghcr.io/zaneafk/comms-server:${COMMS_VERSION:-latest}
     restart: unless-stopped
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__Default: "Host=postgres;Database=${DATABASE_NAME};Username=${DATABASE_USER};Password=${DATABASE_PASSWORD};Port=5432"
+      ConnectionStrings__Default: "Host=postgres;Database=CommsDb;Username=${DATABASE_USER};Password=${DATABASE_PASSWORD};Port=5432"
       Jwt__Key: ${JWT_KEY}
     depends_on:
       postgres:
@@ -26,14 +35,14 @@ services:
     image: postgres:17
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_NAME}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d CommsDb"]
       interval: 5s
       timeout: 5s
       retries: 5
     environment:
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_DB: CommsDb
     volumes:
       - comms_postgres_data:/var/lib/postgresql/data
 
