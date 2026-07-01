@@ -29,7 +29,7 @@
 				@input="onInputChange"
 			/>
 			<button class="send-btn" type="submit" :disabled="!messageInput.trim()">
-				<svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+				<ArrowUp />
 			</button>
 		</form>
 	</div>
@@ -37,6 +37,7 @@
 
 <script setup lang="ts">
 import { ref, computed, nextTick, watch } from 'vue'
+import { ArrowUp } from 'lucide-vue-next'
 import { formatTime } from '@/common/helper'
 import { useAuthStore } from '@/stores/auth'
 import { useChatStore } from '@/stores/chat'
