@@ -6,7 +6,10 @@
 				<SideBar />
 			</aside>
 			<main class="chat-area">
-				<ChatArea />
+				<ChatArea v-if="chatStore.activeConversation" />
+				<div v-else class="chat-empty">
+					<p>Select a conversation or create a new one.</p>
+				</div>
 			</main>
 		</div>
 	</div>

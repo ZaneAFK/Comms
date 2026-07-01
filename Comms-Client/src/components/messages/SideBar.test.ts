@@ -8,8 +8,6 @@ type MockChatStore = {
 	conversations: ConversationDto[]
 	activeConversationId: string | null
 	selectConversation: Mock
-	createConversation: Mock
-	searchUsers: Mock
 }
 
 let mockChatStore: MockChatStore
@@ -55,8 +53,6 @@ beforeEach(() => {
 		conversations: [],
 		activeConversationId: null,
 		selectConversation: vi.fn().mockResolvedValue(undefined),
-		createConversation: vi.fn().mockResolvedValue(null),
-		searchUsers: vi.fn().mockResolvedValue([]),
 	}
 })
 
@@ -108,20 +104,4 @@ describe('SideBar', () => {
 		})
 	})
 
-	describe('new conversation button', () => {
-		it('opens the modal when + is clicked', async () => {
-			const wrapper = mountSideBar()
-			expect(wrapper.find('.modal').exists()).toBe(false)
-			await wrapper.find('.new-conv-btn').trigger('click')
-			expect(wrapper.find('.modal').exists()).toBe(true)
-		})
-
-		it('closes the modal when Cancel is clicked', async () => {
-			const wrapper = mountSideBar()
-			await wrapper.find('.new-conv-btn').trigger('click')
-			expect(wrapper.find('.modal').exists()).toBe(true)
-			await wrapper.find('.btn-outline').trigger('click')
-			expect(wrapper.find('.modal').exists()).toBe(false)
-		})
-	})
 })

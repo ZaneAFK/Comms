@@ -1,39 +1,37 @@
 <template>
-	<div class="login-form rounded">
-		<form @submit.prevent="submit" class="flex flex-col gap-[30px] items-center">
-			<h2 class="text-xl font-semibold">Sign in to your account</h2>
+	<div class="auth-card">
+		<form @submit.prevent="submit" class="form-stack">
+			<h2>Sign in</h2>
 
-			<p v-if="registered" class="alert alert-info text-sm w-full" role="status">
+			<p v-if="registered" class="alert alert-info" role="status">
 				Account created! You can now sign in.
 			</p>
 
-			<label class="block mb-3 w-full">
+			<label>
 				<span class="sr-only">Email</span>
-				<input v-model="email" type="email" autocomplete="username" required
-					class="w-full p-2 border rounded" placeholder="you@example.com" />
+				<input v-model="email" type="email" autocomplete="username" required placeholder="you@example.com" />
 			</label>
 
-			<label class="block mb-3 w-full">
+			<label>
 				<span class="sr-only">Password</span>
-				<div class="relative w-full">
-					<input v-model="password" :type="show ? 'text' : 'password'" autocomplete="current-password" required
-						class="w-full p-2 border rounded pr-10" placeholder="Password" />
-					<button type="button" @click="show = !show">
+				<div class="password-wrap">
+					<input v-model="password" :type="show ? 'text' : 'password'" autocomplete="current-password" required placeholder="Password" />
+					<button type="button" class="eye-btn" @click="show = !show">
 						<Eye v-if="show" :size="15" />
-						<EyeOff v-else :size="15"/>
+						<EyeOff v-else :size="15" />
 					</button>
 				</div>
 			</label>
 
-			<button type="submit" v-on:click="submit" :disabled="loading" class="btn-primary text-white p-2 rounded">
+			<button type="submit" :disabled="loading" class="btn btn-primary btn-lg">
 				<span v-if="loading">Signing in…</span><span v-else>Sign in</span>
 			</button>
 
-			<p v-if="error" class="text-sm text-red-600 mt-3" role="alert" aria-live="polite">{{ error }}</p>
+			<p v-if="error" class="alert alert-error" role="alert" aria-live="polite">{{ error }}</p>
 
-			<p class="text-sm">
+			<p class="auth-footer">
 				Don't have an account?
-				<RouterLink to="/register" class="text-blue-600 hover:underline">Create one</RouterLink>
+				<RouterLink to="/register" class="auth-link">Create one</RouterLink>
 			</p>
 		</form>
 	</div>
