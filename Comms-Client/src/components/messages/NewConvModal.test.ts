@@ -52,7 +52,7 @@ describe('NewConvModal', () => {
 	it('renders the modal', () => {
 		const wrapper = mountModal()
 		expect(wrapper.find('.modal').exists()).toBe(true)
-		expect(wrapper.find('h2').text()).toBe('New Conversation')
+		expect(wrapper.find('h2').text()).toBe('New conversation')
 	})
 
 	it('emits close when Cancel is clicked', async () => {
@@ -61,35 +61,60 @@ describe('NewConvModal', () => {
 		expect(wrapper.emitted('close')).toBeTruthy()
 	})
 
-	it('keeps the Create button disabled when the conversation name is empty', () => {
+	it('keeps the Create button disabled when no members are selected', () => {
 		const wrapper = mountModal()
 		expect(wrapper.find('.modal-actions .btn-primary').attributes('disabled')).toBeDefined()
 	})
 
-	it('enables the Create button once a name is entered', async () => {
+	it('enables the Create button once a member is added', async () => {
+		vi.useFakeTimers()
+		const searchResult: UserSearchResult = { id: 'user-2', username: 'bob' }
+		mockChatStore.searchUsers = vi.fn().mockResolvedValue([searchResult])
+
 		const wrapper = mountModal()
-		await wrapper.find('input[placeholder="Conversation name"]').setValue('Test Chat')
+		await wrapper.find('input[placeholder="Search people…"]').setValue('bob')
+		await wrapper.find('input[placeholder="Search people…"]').trigger('input')
+		await vi.advanceTimersByTimeAsync(300)
+		await wrapper.vm.$nextTick()
+		await wrapper.find('.user-result-item').trigger('click')
+
 		expect(wrapper.find('.modal-actions .btn-primary').attributes('disabled')).toBeUndefined()
 	})
 
-	it('calls createConversation with the name and selected member IDs', async () => {
+	it('calls createConversation with the auto-generated name and selected member IDs', async () => {
+		vi.useFakeTimers()
 		const conv = makeConversation()
+		const searchResult: UserSearchResult = { id: 'user-2', username: 'bob' }
 		mockChatStore.createConversation = vi.fn().mockResolvedValue(conv)
+		mockChatStore.searchUsers = vi.fn().mockResolvedValue([searchResult])
 
 		const wrapper = mountModal()
-		await wrapper.find('input[placeholder="Conversation name"]').setValue('Test Chat')
+		await wrapper.find('input[placeholder="Search people…"]').setValue('bob')
+		await wrapper.find('input[placeholder="Search people…"]').trigger('input')
+		await vi.advanceTimersByTimeAsync(300)
+		await wrapper.vm.$nextTick()
+		await wrapper.find('.user-result-item').trigger('click')
 		await wrapper.find('.modal-actions .btn-primary').trigger('click')
-		expect(mockChatStore.createConversation).toHaveBeenCalledWith('Test Chat', [], 'test-token')
+
+		expect(mockChatStore.createConversation).toHaveBeenCalledWith('bob', ['user-2'], 'test-token')
 	})
 
 	it('emits close after a conversation is successfully created', async () => {
+		vi.useFakeTimers()
 		const conv = makeConversation()
+		const searchResult: UserSearchResult = { id: 'user-2', username: 'bob' }
 		mockChatStore.createConversation = vi.fn().mockResolvedValue(conv)
+		mockChatStore.searchUsers = vi.fn().mockResolvedValue([searchResult])
 
 		const wrapper = mountModal()
-		await wrapper.find('input[placeholder="Conversation name"]').setValue('Test Chat')
+		await wrapper.find('input[placeholder="Search people…"]').setValue('bob')
+		await wrapper.find('input[placeholder="Search people…"]').trigger('input')
+		await vi.advanceTimersByTimeAsync(300)
+		await wrapper.vm.$nextTick()
+		await wrapper.find('.user-result-item').trigger('click')
 		await wrapper.find('.modal-actions .btn-primary').trigger('click')
 		await wrapper.vm.$nextTick()
+
 		expect(wrapper.emitted('close')).toBeTruthy()
 	})
 
@@ -99,8 +124,8 @@ describe('NewConvModal', () => {
 		mockChatStore.searchUsers = vi.fn().mockResolvedValue([searchResult])
 
 		const wrapper = mountModal()
-		await wrapper.find('input[placeholder="Search users…"]').setValue('bob')
-		await wrapper.find('input[placeholder="Search users…"]').trigger('input')
+		await wrapper.find('input[placeholder="Search people…"]').setValue('bob')
+		await wrapper.find('input[placeholder="Search people…"]').trigger('input')
 		await vi.advanceTimersByTimeAsync(300)
 		await wrapper.vm.$nextTick()
 
@@ -116,8 +141,8 @@ describe('NewConvModal', () => {
 		const wrapper = mountModal()
 
 		for (let i = 0; i < 2; i++) {
-			await wrapper.find('input[placeholder="Search users…"]').setValue('bob')
-			await wrapper.find('input[placeholder="Search users…"]').trigger('input')
+			await wrapper.find('input[placeholder="Search people…"]').setValue('bob')
+			await wrapper.find('input[placeholder="Search people…"]').trigger('input')
 			await vi.advanceTimersByTimeAsync(300)
 			await wrapper.vm.$nextTick()
 			await wrapper.find('.user-result-item').trigger('click')
@@ -132,8 +157,8 @@ describe('NewConvModal', () => {
 		mockChatStore.searchUsers = vi.fn().mockResolvedValue([searchResult])
 
 		const wrapper = mountModal()
-		await wrapper.find('input[placeholder="Search users…"]').setValue('bob')
-		await wrapper.find('input[placeholder="Search users…"]').trigger('input')
+		await wrapper.find('input[placeholder="Search people…"]').setValue('bob')
+		await wrapper.find('input[placeholder="Search people…"]').trigger('input')
 		await vi.advanceTimersByTimeAsync(300)
 		await wrapper.vm.$nextTick()
 		await wrapper.find('.user-result-item').trigger('click')

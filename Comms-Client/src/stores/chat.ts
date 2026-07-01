@@ -26,6 +26,8 @@ export const useChatStore = defineStore('chat', () => {
 			.withAutomaticReconnect()
 			.build()
 
+		connection.value = hub
+
 		hub.on('ReceiveMessage', (message: MessageDto) => {
 			const list = messages.value.get(message.conversationId) ?? []
 			messages.value.set(message.conversationId, [...list, message])
@@ -47,7 +49,6 @@ export const useChatStore = defineStore('chat', () => {
 		})
 
 		await hub.start()
-		connection.value = hub
 	}
 
 	async function disconnect() {

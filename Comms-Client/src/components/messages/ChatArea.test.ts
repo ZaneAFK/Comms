@@ -57,9 +57,9 @@ function mountChatArea() {
 
 beforeEach(() => {
 	mockChatStore = {
-		activeConversation: null,
+		activeConversation: makeConversation(),
 		activeMessages: [],
-		activeConversationId: null,
+		activeConversationId: 'conv-1',
 		getTypingUsers: vi.fn().mockReturnValue([]),
 		sendMessage: vi.fn().mockResolvedValue(undefined),
 		startTyping: vi.fn().mockResolvedValue(undefined),
@@ -74,13 +74,6 @@ afterEach(() => {
 })
 
 describe('ChatArea', () => {
-	describe('empty state', () => {
-		it('shows the empty state when no conversation is selected', () => {
-			const wrapper = mountChatArea()
-			expect(wrapper.find('.chat-empty').exists()).toBe(true)
-		})
-	})
-
 	describe('chat header', () => {
 		beforeEach(() => {
 			mockChatStore.activeConversation = makeConversation()

@@ -1,13 +1,14 @@
 <template>
 	<div class="modal-backdrop" @click.self="closeModal">
 		<div class="modal">
-			<h2>New Conversation</h2>
+			<h2>New conversation</h2>
 			<div class="form-stack">
-				<input v-model="newConvName" placeholder="Conversation name" />
 				<input
+					type="text"
 					v-model="userSearch"
-					placeholder="Search users…"
+					placeholder="Search people…"
 					@input="onUserSearch"
+					autofocus
 				/>
 				<div class="user-results" v-if="userResults.length">
 					<button
@@ -27,7 +28,9 @@
 				</div>
 				<div class="modal-actions">
 					<button class="btn btn-outline" @click="closeModal">Cancel</button>
-					<button class="btn btn-primary" @click="createConversation" :disabled="!newConvName.trim()">Create</button>
+					<button class="btn btn-primary" @click="createConversation" :disabled="!selectedMembers.length">
+						{{ selectedMembers.length > 1 ? 'Create Group' : 'Start chat' }}
+					</button>
 				</div>
 			</div>
 		</div>
@@ -37,7 +40,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import type { UserSearchResult } from '@/types'
-
 import { useChatStore } from '@/stores/chat'
 import { useAuthStore } from '@/stores/auth'
 
@@ -46,25 +48,21 @@ const emit = defineEmits<{ close: [] }>()
 const chatStore = useChatStore()
 const authStore = useAuthStore()
 
-const newConvName = ref('')
 const userSearch = ref('')
 const userResults = ref<UserSearchResult[]>([])
 const selectedMembers = ref<UserSearchResult[]>([])
 
 async function createConversation() {
+	const name = selectedMembers.value.map(m => m.username).join(', ')
 	const conv = await chatStore.createConversation(
-		newConvName.value.trim(),
+		name,
 		selectedMembers.value.map(m => m.id),
 		authStore.token!
 	)
 	if (conv) {
 		closeModal()
-		await selectConversation(conv.id)
+		await chatStore.selectConversation(conv.id, authStore.token!)
 	}
-}
-
-async function selectConversation(id: string) {
-	await chatStore.selectConversation(id, authStore.token!)
 }
 
 function addMember(user: UserSearchResult) {
@@ -89,7 +87,6 @@ async function onUserSearch() {
 }
 
 function closeModal() {
-	newConvName.value = ''
 	userSearch.value = ''
 	userResults.value = []
 	selectedMembers.value = []

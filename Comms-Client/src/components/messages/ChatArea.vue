@@ -1,11 +1,11 @@
 <template>
-	<div v-if="chatStore.activeConversation">
-		<div class="chat-header">
-			<span class="chat-title">{{ chatStore.activeConversation.name }}</span>
-			<span class="chat-members">{{ chatStore.activeConversation.members.map(m => m.username).join(', ') }}</span>
-		</div>
+	<div class="chat-header">
+		<span class="chat-title">{{ chatStore.activeConversation!.name }}</span>
+		<span class="chat-members">{{ chatStore.activeConversation!.members.map(m => m.username).join(', ') }}</span>
+	</div>
 
-		<div ref="messagesContainer" class="messages-container">
+	<div class="chat-body">
+		<div ref="chatBody" class="messages-container">
 			<div
 				v-for="msg in chatStore.activeMessages"
 				:key="msg.id"
@@ -24,20 +24,20 @@
 			<input
 				v-model="messageInput"
 				class="message-input"
-				placeholder="Type a message…"
+				placeholder="Type a message..."
 				autocomplete="off"
 				@input="onInputChange"
 			/>
-			<button class="btn btn-primary send-btn" type="submit" :disabled="!messageInput.trim()">Send</button>
+			<button class="send-btn" type="submit" :disabled="!messageInput.trim()">
+				<ArrowUp />
+			</button>
 		</form>
-	</div>
-	<div v-else class="chat-empty">
-		<p>Select a conversation or create a new one.</p>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick, watch } from 'vue'
+import { ref, computed, nextTick, watch } from 'vue'
+import { ArrowUp } from 'lucide-vue-next'
 import { formatTime } from '@/common/helper'
 import { useAuthStore } from '@/stores/auth'
 import { useChatStore } from '@/stores/chat'
@@ -47,7 +47,7 @@ const chatStore = useChatStore()
 
 const currentUsername = authStore.user?.username
 const messageInput = ref('')
-const messagesContainer = ref<HTMLElement | null>(null)
+const chatBody = ref<HTMLElement | null>(null)
 let typingTimeout: ReturnType<typeof setTimeout> | null = null
 
 const typingText = computed(() => {
@@ -59,16 +59,10 @@ const typingText = computed(() => {
 	return `${users.map(u => u.username).join(', ')} are typing…`
 })
 
-onMounted(async () => {
-	const token = authStore.token!
-	await chatStore.loadConversations(token)
-	await chatStore.connect(token)
-})
-
 watch(() => chatStore.activeMessages, async () => {
 	await nextTick()
-	if (messagesContainer.value) {
-		messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+	if (chatBody.value) {
+		chatBody.value.scrollTop = chatBody.value.scrollHeight
 	}
 })
 

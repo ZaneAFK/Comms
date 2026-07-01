@@ -1,49 +1,45 @@
 <template>
-	<div class="login-form rounded">
-		<form @submit.prevent="submit" class="flex flex-col gap-[30px] items-center">
-			<h2 class="text-xl font-semibold">Create an account</h2>
+	<div class="auth-card">
+		<form @submit.prevent="submit" class="form-stack">
+			<h2>Create an account</h2>
 
-			<label class="block mb-3 w-full">
+			<label>
 				<span class="sr-only">Username</span>
-				<input v-model="username" type="text" autocomplete="username" required
-					class="w-full p-2 border rounded" placeholder="Username" />
+				<input v-model="username" type="text" autocomplete="username" required placeholder="Username" />
 			</label>
 
-			<label class="block mb-3 w-full">
+			<label>
 				<span class="sr-only">Email</span>
-				<input v-model="email" type="email" autocomplete="email" required
-					class="w-full p-2 border rounded" placeholder="you@example.com" />
+				<input v-model="email" type="email" autocomplete="email" required placeholder="you@example.com" />
 			</label>
 
-			<label class="block mb-3 w-full">
+			<label>
 				<span class="sr-only">Password</span>
-				<div class="relative w-full">
-					<input v-model="password" :type="show ? 'text' : 'password'" autocomplete="new-password" required
-						class="w-full p-2 border rounded pr-10" placeholder="Password" />
-					<button type="button" @click="show = !show">
+				<div class="password-wrap">
+					<input v-model="password" :type="show ? 'text' : 'password'" autocomplete="new-password" required placeholder="Password" />
+					<button type="button" class="eye-btn" @click="show = !show">
 						<Eye v-if="show" :size="15" />
 						<EyeOff v-else :size="15" />
 					</button>
 				</div>
 			</label>
 
-			<label class="block mb-3 w-full">
+			<label>
 				<span class="sr-only">Confirm password</span>
-				<div class="relative w-full">
-					<input v-model="confirmPassword" :type="show ? 'text' : 'password'" autocomplete="new-password" required
-						class="w-full p-2 border rounded pr-10" placeholder="Confirm password" />
+				<div class="password-wrap">
+					<input v-model="confirmPassword" :type="show ? 'text' : 'password'" autocomplete="new-password" required placeholder="Confirm password" />
 				</div>
 			</label>
 
-			<button type="submit" :disabled="loading" class="btn-primary text-white p-2 rounded">
+			<button type="submit" :disabled="loading" class="btn btn-primary btn-lg">
 				<span v-if="loading">Creating account…</span><span v-else>Create account</span>
 			</button>
 
-			<p v-if="error" class="text-sm text-red-600 mt-3" role="alert" aria-live="polite">{{ error }}</p>
+			<p v-if="error" class="alert alert-error" role="alert" aria-live="polite">{{ error }}</p>
 
-			<p class="text-sm">
+			<p class="auth-footer">
 				Already have an account?
-				<RouterLink to="/login" class="text-blue-600 hover:underline">Sign in</RouterLink>
+				<RouterLink to="/login" class="auth-link">Sign in</RouterLink>
 			</p>
 		</form>
 	</div>
