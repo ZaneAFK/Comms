@@ -14,7 +14,7 @@ let mockChatStore: MockChatStore
 
 vi.mock('@/stores/auth', () => ({
 	useAuthStore: () => ({
-		user: { username: 'alice', email: 'alice@example.com' },
+		user: { id: 'user-1', username: 'alice', email: 'alice@example.com' },
 		token: 'test-token',
 	}),
 }))

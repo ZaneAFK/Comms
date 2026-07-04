@@ -20,7 +20,7 @@ let mockChatStore: MockChatStore
 
 vi.mock('@/stores/auth', () => ({
 	useAuthStore: () => ({
-		user: { username: 'alice', email: 'alice@example.com' },
+		user: { id: 'user-1', username: 'alice', email: 'alice@example.com' },
 		token: 'test-token',
 	}),
 }))
@@ -100,19 +100,19 @@ describe('ChatArea', () => {
 		})
 
 		it('applies message-mine to messages sent by the current user', () => {
-			mockChatStore.activeMessages = [makeMessage({ senderUsername: 'alice' })]
+			mockChatStore.activeMessages = [makeMessage({ senderId: 'user-1', senderUsername: 'alice' })]
 			const wrapper = mountChatArea()
 			expect(wrapper.find('.message-bubble').classes()).toContain('message-mine')
 		})
 
 		it('applies message-theirs to messages from other users', () => {
-			mockChatStore.activeMessages = [makeMessage({ senderUsername: 'bob' })]
+			mockChatStore.activeMessages = [makeMessage({ senderId: 'user-2', senderUsername: 'bob' })]
 			const wrapper = mountChatArea()
 			expect(wrapper.find('.message-bubble').classes()).toContain('message-theirs')
 		})
 
 		it('renders message content and sender', () => {
-			mockChatStore.activeMessages = [makeMessage({ senderUsername: 'bob', content: 'Hey there!' })]
+			mockChatStore.activeMessages = [makeMessage({ senderId: 'user-2', senderUsername: 'bob', content: 'Hey there!' })]
 			const wrapper = mountChatArea()
 			expect(wrapper.find('.message-content').text()).toBe('Hey there!')
 			expect(wrapper.find('.message-sender').text()).toBe('bob')

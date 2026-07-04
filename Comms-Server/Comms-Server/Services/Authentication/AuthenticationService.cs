@@ -60,6 +60,7 @@ namespace Comms_Server.Services
 				Token = token,
 				User = new UserDto
 				{
+					Id = user.Id,
 					Username = user.UserName!,
 					Email = user.Email!
 				}
