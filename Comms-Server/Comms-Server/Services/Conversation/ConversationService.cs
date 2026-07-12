@@ -27,11 +27,11 @@ namespace Comms_Server.Services
 			return await PopulateConversationDtos(conversations, userId);
 		}
 
-		public async Task<IEnumerable<Guid>> GetUserConversationIdsAsync(Guid userId)
+		public async Task<IEnumerable<Guid>> GetConversationMemberIdsAsync(Guid conversationId)
 		{
 			return await Factory.Query<ConversationMember>()
-				.Where(cm => cm.UserId == userId)
-				.Select(cm => cm.ConversationId)
+				.Where(cm => cm.ConversationId == conversationId)
+				.Select(cm => cm.UserId)
 				.ToListAsync();
 		}
 

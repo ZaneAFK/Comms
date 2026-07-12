@@ -104,8 +104,7 @@ namespace Comms_Server
 			services.AddScoped<IJwtService, JwtService>();
 			services.AddScoped<IConversationService, ConversationService>();
 			services.AddScoped<IMessageService, MessageService>();
-			services.AddSingleton<IUserConnectionTracker, UserConnectionTracker>();
-			services.AddScoped<IChatHub, ChatHub>();
+			services.AddScoped<IChatBroadcaster, ChatBroadcaster>();
 
 			// Logging
 			services.AddLogging();
@@ -133,7 +132,7 @@ namespace Comms_Server
 		public static WebApplication MapCommsEndpoints(this WebApplication app)
 		{
 			app.MapControllers();
-			app.MapHub<ChatSignalRHub>("/hubs/chat");
+			app.MapHub<ChatHub>("/hubs/chat");
 
 			return app;
 		}

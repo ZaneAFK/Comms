@@ -10,6 +10,8 @@ export const useChatStore = defineStore('chat', () => {
 	const messages = ref<Map<string, MessageDto[]>>(new Map())
 	const typingUsers = ref<Map<string, TypingUser[]>>(new Map())
 
+	let conversationsReloadPromise: Promise<void> | null = null
+
 	const activeConversationId = ref<string | null>(null)
 	const activeConversation = computed(() =>
 		conversations.value.find(c => c.id === activeConversationId.value) ?? null
@@ -37,8 +39,10 @@ export const useChatStore = defineStore('chat', () => {
 			if (conv) {
 				conv.lastMessage = message
 			} else {
-				// First message in a new conversation being received - reload conversations so it appears
-				await loadConversations(token)
+				conversationsReloadPromise ??= loadConversations(token).finally(() => {
+					conversationsReloadPromise = null
+				})
+				await conversationsReloadPromise
 			}
 		})
 

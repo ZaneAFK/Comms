@@ -13,13 +13,11 @@ namespace Comms_Server.Controllers
 	{
 		private readonly IConversationService _conversationService;
 		private readonly IMessageService _messageService;
-		private readonly IChatHub _chatHub;
 
-		public ConversationsController(IConversationService conversationService, IMessageService messageService, IChatHub chatHub)
+		public ConversationsController(IConversationService conversationService, IMessageService messageService)
 		{
 			_conversationService = conversationService;
 			_messageService = messageService;
-			_chatHub = chatHub;
 		}
 
 		[HttpGet]
@@ -39,8 +37,6 @@ namespace Comms_Server.Controllers
 			{
 				return BadRequest("Failed to create conversation.");
 			}
-
-			await _chatHub.AddUsersToConversationAsync(conversation.Members.Select(m => m.UserId), conversation.Id);
 
 			return Ok(conversation);
 		}

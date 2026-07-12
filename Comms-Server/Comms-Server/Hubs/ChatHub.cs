@@ -6,31 +6,17 @@ using Microsoft.AspNetCore.SignalR;
 namespace Comms_Server.Hubs
 {
 	[Authorize]
-	public class ChatSignalRHub : Hub
+	public class ChatHub : Hub
 	{
 		private readonly IMessageService _messageService;
 		private readonly IConversationService _conversationService;
-		private readonly IChatHub _chatHub;
+		private readonly IChatBroadcaster _chatBroadcaster;
 
-		public ChatSignalRHub(IMessageService messageService, IConversationService conversationService, IChatHub chatHub)
+		public ChatHub(IMessageService messageService, IConversationService conversationService, IChatBroadcaster chatBroadcaster)
 		{
 			_messageService = messageService;
 			_conversationService = conversationService;
-			_chatHub = chatHub;
-		}
-
-		public override async Task OnConnectedAsync()
-		{
-			var userId = GetUserId();
-			var conversationIds = await _conversationService.GetUserConversationIdsAsync(userId);
-			await _chatHub.RegisterConnectionAsync(userId, Context.ConnectionId, conversationIds);
-			await base.OnConnectedAsync();
-		}
-
-		public override async Task OnDisconnectedAsync(Exception? exception)
-		{
-			await _chatHub.UnregisterConnectionAsync(GetUserId(), Context.ConnectionId);
-			await base.OnDisconnectedAsync(exception);
+			_chatBroadcaster = chatBroadcaster;
 		}
 
 		public async Task SendMessage(Guid conversationId, string content)
@@ -42,20 +28,23 @@ namespace Comms_Server.Hubs
 			}
 
 			var message = await _messageService.CreateMessageAsync(conversationId, userId, content);
-			await _chatHub.SendMessageAsync(conversationId, message);
+			var memberIds = await _conversationService.GetConversationMemberIdsAsync(conversationId);
+			await _chatBroadcaster.SendMessageAsync(memberIds, message);
 		}
 
 		public async Task StartTyping(Guid conversationId)
 		{
 			var userId = GetUserId();
 			var username = Context.User?.FindFirst(ClaimTypes.Name)?.Value ?? "Unknown";
-			await _chatHub.NotifyTypingAsync(conversationId, Context.ConnectionId, userId, username);
+			var memberIds = await _conversationService.GetConversationMemberIdsAsync(conversationId);
+			await _chatBroadcaster.NotifyTypingAsync(conversationId, memberIds, userId, username);
 		}
 
 		public async Task StopTyping(Guid conversationId)
 		{
 			var userId = GetUserId();
-			await _chatHub.NotifyStoppedTypingAsync(conversationId, Context.ConnectionId, userId);
+			var memberIds = await _conversationService.GetConversationMemberIdsAsync(conversationId);
+			await _chatBroadcaster.NotifyStoppedTypingAsync(conversationId, memberIds, userId);
 		}
 
 		private Guid GetUserId()

@@ -9,27 +9,27 @@ using NUnit.Framework;
 namespace Comms_Server.Testing.Hubs
 {
 	[TestFixture]
-	public class ChatSignalRHubTest
+	public class ChatHubTest
 	{
 		private const string ConnectionId = "conn-1";
 
 		private Mock<IMessageService> _messageService = null!;
 		private Mock<IConversationService> _conversationService = null!;
-		private Mock<IChatHub> _chatHub = null!;
+		private Mock<IChatBroadcaster> _chatBroadcaster = null!;
 		private Mock<HubCallerContext> _context = null!;
-		private ChatSignalRHub _hub = null!;
+		private ChatHub _hub = null!;
 
 		[SetUp]
 		public void Setup()
 		{
 			_messageService = new Mock<IMessageService>();
 			_conversationService = new Mock<IConversationService>();
-			_chatHub = new Mock<IChatHub>();
+			_chatBroadcaster = new Mock<IChatBroadcaster>();
 
 			_context = new Mock<HubCallerContext>();
 			_context.Setup(c => c.ConnectionId).Returns(ConnectionId);
 
-			_hub = new ChatSignalRHub(_messageService.Object, _conversationService.Object, _chatHub.Object)
+			_hub = new ChatHub(_messageService.Object, _conversationService.Object, _chatBroadcaster.Object)
 			{
 				Context = _context.Object
 			};
@@ -45,55 +45,6 @@ namespace Comms_Server.Testing.Hubs
 			_context.Setup(c => c.User).Returns(new ClaimsPrincipal(new ClaimsIdentity(claims)));
 		}
 
-		// ── OnConnectedAsync ──────────────────────────────────────────────────────
-
-		[Test]
-		public async Task OnConnectedAsync_RegistersConnectionWithTheUsersConversationIds()
-		{
-			// Arrange
-			var userId = Guid.NewGuid();
-			SetupCaller(userId);
-			var conversationIds = new[] { Guid.NewGuid(), Guid.NewGuid() };
-			_conversationService.Setup(s => s.GetUserConversationIdsAsync(userId)).ReturnsAsync(conversationIds);
-
-			// Act
-			await _hub.OnConnectedAsync();
-
-			// Assert
-			_chatHub.Verify(h => h.RegisterConnectionAsync(userId, ConnectionId,
-				It.Is<IEnumerable<Guid>>(ids => ids.SequenceEqual(conversationIds))), Times.Once);
-		}
-
-		[Test]
-		public async Task OnConnectedAsync_WhenNameIdentifierClaimIsMissing_RegistersWithAnEmptyGuid()
-		{
-			// Arrange
-			_context.Setup(c => c.User).Returns(new ClaimsPrincipal(new ClaimsIdentity()));
-			_conversationService.Setup(s => s.GetUserConversationIdsAsync(Guid.Empty)).ReturnsAsync([]);
-
-			// Act
-			await _hub.OnConnectedAsync();
-
-			// Assert
-			_chatHub.Verify(h => h.RegisterConnectionAsync(Guid.Empty, ConnectionId, It.IsAny<IEnumerable<Guid>>()), Times.Once);
-		}
-
-		// ── OnDisconnectedAsync ───────────────────────────────────────────────────
-
-		[Test]
-		public async Task OnDisconnectedAsync_UnregistersTheConnection()
-		{
-			// Arrange
-			var userId = Guid.NewGuid();
-			SetupCaller(userId);
-
-			// Act
-			await _hub.OnDisconnectedAsync(null);
-
-			// Assert
-			_chatHub.Verify(h => h.UnregisterConnectionAsync(userId, ConnectionId), Times.Once);
-		}
-
 		// ── SendMessage ───────────────────────────────────────────────────────────
 
 		[Test]
@@ -104,6 +55,8 @@ namespace Comms_Server.Testing.Hubs
 			var conversationId = Guid.NewGuid();
 			SetupCaller(userId);
 			_conversationService.Setup(s => s.IsUserMemberAsync(conversationId, userId)).ReturnsAsync(true);
+			var memberIds = new[] { userId, Guid.NewGuid() };
+			_conversationService.Setup(s => s.GetConversationMemberIdsAsync(conversationId)).ReturnsAsync(memberIds);
 			var message = new MessageDto { Id = Guid.NewGuid(), ConversationId = conversationId, SenderId = userId, Content = "Hello" };
 			_messageService.Setup(s => s.CreateMessageAsync(conversationId, userId, "Hello")).ReturnsAsync(message);
 
@@ -111,7 +64,7 @@ namespace Comms_Server.Testing.Hubs
 			await _hub.SendMessage(conversationId, "Hello");
 
 			// Assert
-			_chatHub.Verify(h => h.SendMessageAsync(conversationId, message), Times.Once);
+			_chatBroadcaster.Verify(h => h.SendMessageAsync(memberIds, message), Times.Once);
 		}
 
 		[Test]
@@ -128,24 +81,26 @@ namespace Comms_Server.Testing.Hubs
 
 			// Assert
 			_messageService.Verify(s => s.CreateMessageAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<string>()), Times.Never);
-			_chatHub.Verify(h => h.SendMessageAsync(It.IsAny<Guid>(), It.IsAny<MessageDto>()), Times.Never);
+			_chatBroadcaster.Verify(h => h.SendMessageAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<MessageDto>()), Times.Never);
 		}
 
 		// ── StartTyping ───────────────────────────────────────────────────────────
 
 		[Test]
-		public async Task StartTyping_NotifiesTypingWithTheCallersDetailsExcludingItsOwnConnection()
+		public async Task StartTyping_NotifiesTypingWithTheCallersDetails()
 		{
 			// Arrange
 			var userId = Guid.NewGuid();
 			var conversationId = Guid.NewGuid();
 			SetupCaller(userId, "alice");
+			var memberIds = new[] { userId, Guid.NewGuid() };
+			_conversationService.Setup(s => s.GetConversationMemberIdsAsync(conversationId)).ReturnsAsync(memberIds);
 
 			// Act
 			await _hub.StartTyping(conversationId);
 
 			// Assert
-			_chatHub.Verify(h => h.NotifyTypingAsync(conversationId, ConnectionId, userId, "alice"), Times.Once);
+			_chatBroadcaster.Verify(h => h.NotifyTypingAsync(conversationId, memberIds, userId, "alice"), Times.Once);
 		}
 
 		[Test]
@@ -155,29 +110,33 @@ namespace Comms_Server.Testing.Hubs
 			var userId = Guid.NewGuid();
 			var conversationId = Guid.NewGuid();
 			SetupCaller(userId, username: null);
+			var memberIds = new[] { userId };
+			_conversationService.Setup(s => s.GetConversationMemberIdsAsync(conversationId)).ReturnsAsync(memberIds);
 
 			// Act
 			await _hub.StartTyping(conversationId);
 
 			// Assert
-			_chatHub.Verify(h => h.NotifyTypingAsync(conversationId, ConnectionId, userId, "Unknown"), Times.Once);
+			_chatBroadcaster.Verify(h => h.NotifyTypingAsync(conversationId, memberIds, userId, "Unknown"), Times.Once);
 		}
 
 		// ── StopTyping ────────────────────────────────────────────────────────────
 
 		[Test]
-		public async Task StopTyping_NotifiesStoppedTypingExcludingItsOwnConnection()
+		public async Task StopTyping_NotifiesStoppedTyping()
 		{
 			// Arrange
 			var userId = Guid.NewGuid();
 			var conversationId = Guid.NewGuid();
 			SetupCaller(userId);
+			var memberIds = new[] { userId, Guid.NewGuid() };
+			_conversationService.Setup(s => s.GetConversationMemberIdsAsync(conversationId)).ReturnsAsync(memberIds);
 
 			// Act
 			await _hub.StopTyping(conversationId);
 
 			// Assert
-			_chatHub.Verify(h => h.NotifyStoppedTypingAsync(conversationId, ConnectionId, userId), Times.Once);
+			_chatBroadcaster.Verify(h => h.NotifyStoppedTypingAsync(conversationId, memberIds, userId), Times.Once);
 		}
 	}
 }
