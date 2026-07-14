@@ -104,6 +104,7 @@ namespace Comms_Server
 			services.AddScoped<IJwtService, JwtService>();
 			services.AddScoped<IConversationService, ConversationService>();
 			services.AddScoped<IMessageService, MessageService>();
+			services.AddScoped<IChatBroadcaster, ChatBroadcaster>();
 
 			// Logging
 			services.AddLogging();

@@ -10,22 +10,13 @@ namespace Comms_Server.Hubs
 	{
 		private readonly IMessageService _messageService;
 		private readonly IConversationService _conversationService;
+		private readonly IChatBroadcaster _chatBroadcaster;
 
-		public ChatHub(IMessageService messageService, IConversationService conversationService)
+		public ChatHub(IMessageService messageService, IConversationService conversationService, IChatBroadcaster chatBroadcaster)
 		{
 			_messageService = messageService;
 			_conversationService = conversationService;
-		}
-
-		public override async Task OnConnectedAsync()
-		{
-			var userId = GetUserId();
-			var conversations = await _conversationService.GetUserConversationsAsync(userId);
-			foreach (var conversation in conversations)
-			{
-				await Groups.AddToGroupAsync(Context.ConnectionId, conversation.Id.ToString());
-			}
-			await base.OnConnectedAsync();
+			_chatBroadcaster = chatBroadcaster;
 		}
 
 		public async Task SendMessage(Guid conversationId, string content)
@@ -37,31 +28,23 @@ namespace Comms_Server.Hubs
 			}
 
 			var message = await _messageService.CreateMessageAsync(conversationId, userId, content);
-			await Clients.Group(conversationId.ToString()).SendAsync("ReceiveMessage", message);
+			var memberIds = await _conversationService.GetConversationMemberIdsAsync(conversationId);
+			await _chatBroadcaster.SendMessageAsync(memberIds, message);
 		}
 
 		public async Task StartTyping(Guid conversationId)
 		{
 			var userId = GetUserId();
 			var username = Context.User?.FindFirst(ClaimTypes.Name)?.Value ?? "Unknown";
-			await Clients.OthersInGroup(conversationId.ToString())
-				.SendAsync("UserTyping", new { ConversationId = conversationId, UserId = userId, Username = username });
+			var memberIds = await _conversationService.GetConversationMemberIdsAsync(conversationId);
+			await _chatBroadcaster.NotifyTypingAsync(conversationId, memberIds, userId, username);
 		}
 
 		public async Task StopTyping(Guid conversationId)
 		{
 			var userId = GetUserId();
-			await Clients.OthersInGroup(conversationId.ToString())
-				.SendAsync("UserStoppedTyping", new { ConversationId = conversationId, UserId = userId });
-		}
-
-		public async Task JoinConversation(Guid conversationId)
-		{
-			var userId = GetUserId();
-			if (await _conversationService.IsUserMemberAsync(conversationId, userId))
-			{
-				await Groups.AddToGroupAsync(Context.ConnectionId, conversationId.ToString());
-			}
+			var memberIds = await _conversationService.GetConversationMemberIdsAsync(conversationId);
+			await _chatBroadcaster.NotifyStoppedTypingAsync(conversationId, memberIds, userId);
 		}
 
 		private Guid GetUserId()

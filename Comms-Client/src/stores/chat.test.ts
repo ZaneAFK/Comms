@@ -204,7 +204,7 @@ describe('Chat Store', () => {
 	})
 
 	describe('createConversation', () => {
-		it('posts to the API, prepends to conversations, and joins the hub group', async () => {
+		it('posts to the API and prepends the result to conversations', async () => {
 			const store = useChatStore()
 			await store.connect(TOKEN)
 			const conv = makeConversation()
@@ -215,7 +215,6 @@ describe('Chat Store', () => {
 			const result = await store.createConversation('Test Chat', ['user-2'], TOKEN)
 			expect(result).toEqual(conv)
 			expect(store.conversations[0]).toEqual(conv)
-			expect(mockHub.invoke).toHaveBeenCalledWith('JoinConversation', conv.id)
 		})
 
 		it('returns null and does not modify conversations on failure', async () => {
@@ -346,6 +345,7 @@ describe('Chat Store', () => {
 	describe('ReceiveMessage handler', () => {
 		it('appends the incoming message to the correct conversation', async () => {
 			const store = useChatStore()
+			store.conversations.push(makeConversation())
 			await store.connect(TOKEN)
 			const msg = makeMessage()
 			hubHandlers.ReceiveMessage!(msg)
@@ -354,6 +354,7 @@ describe('Chat Store', () => {
 
 		it('appends to existing messages rather than replacing them', async () => {
 			const store = useChatStore()
+			store.conversations.push(makeConversation())
 			vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
 				ok: true,
 				json: () => Promise.resolve([makeMessage({ id: 'msg-1' })]),
@@ -371,6 +372,21 @@ describe('Chat Store', () => {
 			const msg = makeMessage()
 			hubHandlers.ReceiveMessage!(msg)
 			expect(store.conversations[0]!.lastMessage).toEqual(msg)
+		})
+
+		it('refetches conversations when the message belongs to one not yet in the store', async () => {
+			const store = useChatStore()
+			await store.connect(TOKEN)
+			const conv = makeConversation()
+			const fetchMock = vi.fn().mockResolvedValue({
+				ok: true,
+				json: () => Promise.resolve([conv]),
+			})
+			vi.stubGlobal('fetch', fetchMock)
+			const msg = makeMessage()
+			await hubHandlers.ReceiveMessage!(msg)
+			expect(fetchMock).toHaveBeenCalledWith('/api/conversations', expect.anything())
+			expect(store.conversations[0]).toEqual(conv)
 		})
 	})
 

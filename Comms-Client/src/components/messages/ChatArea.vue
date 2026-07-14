@@ -10,7 +10,7 @@
 				v-for="msg in chatStore.activeMessages"
 				:key="msg.id"
 				class="message-bubble"
-				:class="msg.senderUsername === currentUsername ? 'message-mine' : 'message-theirs'"
+				:class="msg.senderId === currentUserId ? 'message-mine' : 'message-theirs'"
 			>
 				<span class="message-sender">{{ msg.senderUsername }}</span>
 				<span class="message-content">{{ msg.content }}</span>
@@ -45,7 +45,7 @@ import { useChatStore } from '@/stores/chat'
 const authStore = useAuthStore()
 const chatStore = useChatStore()
 
-const currentUsername = authStore.user?.username
+const currentUserId = authStore.user?.id
 const messageInput = ref('')
 const chatBody = ref<HTMLElement | null>(null)
 let typingTimeout: ReturnType<typeof setTimeout> | null = null

@@ -10,6 +10,8 @@ export const useChatStore = defineStore('chat', () => {
 	const messages = ref<Map<string, MessageDto[]>>(new Map())
 	const typingUsers = ref<Map<string, TypingUser[]>>(new Map())
 
+	let conversationsReloadPromise: Promise<void> | null = null
+
 	const activeConversationId = ref<string | null>(null)
 	const activeConversation = computed(() =>
 		conversations.value.find(c => c.id === activeConversationId.value) ?? null
@@ -28,12 +30,20 @@ export const useChatStore = defineStore('chat', () => {
 
 		connection.value = hub
 
-		hub.on('ReceiveMessage', (message: MessageDto) => {
+		hub.on('ReceiveMessage', async (message: MessageDto) => {
 			const list = messages.value.get(message.conversationId) ?? []
 			messages.value.set(message.conversationId, [...list, message])
 
 			const conv = conversations.value.find(c => c.id === message.conversationId)
-			if (conv) conv.lastMessage = message
+
+			if (conv) {
+				conv.lastMessage = message
+			} else {
+				conversationsReloadPromise ??= loadConversations(token).finally(() => {
+					conversationsReloadPromise = null
+				})
+				await conversationsReloadPromise
+			}
 		})
 
 		hub.on('UserTyping', (data: TypingUser) => {
@@ -104,9 +114,6 @@ export const useChatStore = defineStore('chat', () => {
 		if (!res.ok) return null
 		const conv: ConversationDto = await res.json()
 		conversations.value.unshift(conv)
-		if (connection.value) {
-			await connection.value.invoke('JoinConversation', conv.id)
-		}
 		return conv
 	}
 

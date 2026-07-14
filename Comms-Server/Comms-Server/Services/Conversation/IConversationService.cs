@@ -5,6 +5,7 @@ namespace Comms_Server.Services
 	public interface IConversationService
 	{
 		Task<IEnumerable<ConversationDto>> GetUserConversationsAsync(Guid userId);
+		Task<IEnumerable<Guid>> GetConversationMemberIdsAsync(Guid conversationId);
 		Task<ConversationDto?> CreateConversationAsync(string name, List<Guid> memberIds, Guid creatorId);
 		Task<bool> IsUserMemberAsync(Guid conversationId, Guid userId);
 	}

@@ -24,7 +24,15 @@ namespace Comms_Server.Services
 				.Select(cm => cm.Conversation)
 				.ToListAsync();
 
-			return await PopulateConversationDtos(conversations);
+			return await PopulateConversationDtos(conversations, userId);
+		}
+
+		public async Task<IEnumerable<Guid>> GetConversationMemberIdsAsync(Guid conversationId)
+		{
+			return await Factory.Query<ConversationMember>()
+				.Where(cm => cm.ConversationId == conversationId)
+				.Select(cm => cm.UserId)
+				.ToListAsync();
 		}
 
 		public async Task<ConversationDto?> CreateConversationAsync(string name, List<Guid> memberIds, Guid creatorId)
@@ -34,7 +42,7 @@ namespace Comms_Server.Services
 
 			using var transaction = await Factory.BeginTransactionAsync();
 
-			var conversation = CreateConversationAndLinkToMembers(name, allMemberIds);
+			var conversation = CreateConversationAndLinkToMembers(name, allMemberIds, creatorId);
 
 			await Factory.SaveAsync();
 			await transaction.CommitAsync();
@@ -70,7 +78,7 @@ namespace Comms_Server.Services
 				cm => cm.ConversationId == conversationId && cm.UserId == userId);
 		}
 
-		async Task<List<ConversationDto>> PopulateConversationDtos(List<Conversation> conversations)
+		async Task<List<ConversationDto>> PopulateConversationDtos(List<Conversation> conversations, Guid requestingUserId)
 		{
 			var result = new List<ConversationDto>();
 
@@ -91,6 +99,13 @@ namespace Comms_Server.Services
 						})
 						.FirstOrDefaultAsync();
 
+				// Hide conversations the creator hasn't sent a first message in yet, so
+				// invited members don't see an empty conversation appear out of nowhere.
+				if (lastMessage == null && convo.CreatorId != requestingUserId)
+				{
+					continue;
+				}
+
 				result.Add(new ConversationDto
 				{
 					Id = convo.Id,
@@ -108,10 +123,11 @@ namespace Comms_Server.Services
 			return result;
 		}
 
-		Conversation CreateConversationAndLinkToMembers(string name, List<Guid> memberIds)
+		Conversation CreateConversationAndLinkToMembers(string name, List<Guid> memberIds, Guid creatorId)
 		{
 			var conversation = Factory.New<Conversation>();
 			conversation.Name = name;
+			conversation.CreatorId = creatorId;
 
 			foreach (var id in memberIds)
 			{

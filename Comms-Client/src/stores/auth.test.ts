@@ -27,7 +27,7 @@ describe('Auth Store', () => {
 		const mockResponse = {
 			succeeded: true,
 			token: 'mock-token',
-			user: { username: 'alice', email: 'alice@example.com' }
+			user: { id: 'user-1', username: 'alice', email: 'alice@example.com' }
 		}
 
 		vi.stubGlobal('fetch', vi.fn(() =>
@@ -132,7 +132,7 @@ describe('Auth Store', () => {
 
 	it('logout clears user, token, and localStorage', async () => {
 		const store = useAuthStore()
-		store.user = { username: 'alice', email: 'alice@example.com' }
+		store.user = { id: 'user-1', username: 'alice', email: 'alice@example.com' }
 		store.token = 'mock-token'
 		localStorage.setItem('user', JSON.stringify(store.user))
 		localStorage.setItem('token', store.token!)

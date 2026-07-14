@@ -37,6 +37,7 @@ namespace Comms_Server.Controllers
 			{
 				return BadRequest("Failed to create conversation.");
 			}
+
 			return Ok(conversation);
 		}
 
