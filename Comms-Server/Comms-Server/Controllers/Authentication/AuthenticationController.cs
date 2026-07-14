@@ -18,15 +18,29 @@ namespace Comms_Server.Controllers
 		}
 
 		[HttpPost("register")]
-		public async Task<RegisterUserResponse> Register([FromBody] RegisterUserRequest request)
+		public async Task<IActionResult> Register([FromBody] RegisterUserRequest request)
 		{
-			return await _authenticationService.RegisterUserAsync(request.Username, request.Email, request.Password);
+			var response = await _authenticationService.RegisterUserAsync(request.Username, request.Email, request.Password);
+
+			if (!response.Succeeded)
+			{
+				return BadRequest(response);
+			}
+
+			return Ok(response);
 		}
 
 		[HttpPost("login")]
-		public async Task<LoginUserResponse> Login([FromBody] LoginUserRequest request)
+		public async Task<IActionResult> Login([FromBody] LoginUserRequest request)
 		{
-			return await _authenticationService.LoginAsync(request.Email, request.Password);
+			var response = await _authenticationService.LoginAsync(request.Email, request.Password);
+
+			if (!response.Succeeded)
+			{
+				return Unauthorized(response);
+			}
+
+			return Ok(response);
 		}
 	}
 }

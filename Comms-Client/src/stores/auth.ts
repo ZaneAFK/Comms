@@ -24,10 +24,6 @@ export const useAuthStore = defineStore('auth', () => {
 
 		const body = await res.json().catch(() => ({}))
 
-		if (!res.ok) {
-			return { success: false, error: 'Login failed' }
-		}
-
 		if (!body.succeeded) {
 			return { success: false, error: body.error ?? 'Login failed' }
 		}
@@ -48,10 +44,6 @@ export const useAuthStore = defineStore('auth', () => {
 		})
 
 		const body = await res.json().catch(() => ({})) as RegisterResponse
-
-		if (!res.ok) {
-			return { success: false, error: 'Registration failed' }
-		}
 
 		if (!body.succeeded) {
 			return { success: false, error: body.error ?? 'Registration failed' }

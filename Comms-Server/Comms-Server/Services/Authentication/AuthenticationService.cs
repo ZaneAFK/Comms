@@ -36,7 +36,7 @@ namespace Comms_Server.Services
 
 		public async Task<LoginUserResponse> LoginAsync(string email, string password)
 		{
-			Logger.LogInformation("Login attempt for email '{Email}'", email);
+			Logger.LogInformation("Attempting login for email '{Email}'", email);
 
 			var result = await _userService.LoginAsync(email, password);
 
