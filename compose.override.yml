@@ -4,9 +4,3 @@ services:
   postgres:
     ports:
       - "5432:5432"
-
-  seq:
-    ports:
-      - "5341:80"
-    environment:
-      SEQ_FIRSTRUN_NOAUTHENTICATION: true
