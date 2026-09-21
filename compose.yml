@@ -3,7 +3,7 @@ services:
     image: nginx:1.27-alpine
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "8002:80"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
@@ -15,7 +15,6 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
-      - seq
 
   backend:
     image: ghcr.io/zaneafk/comms-server:${COMMS_VERSION:-latest}
@@ -28,8 +27,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      seq:
-        condition: service_started
 
   postgres:
     image: postgres:17
@@ -46,15 +43,5 @@ services:
     volumes:
       - comms_postgres_data:/var/lib/postgresql/data
 
-  seq:
-    image: datalust/seq:2025.1
-    restart: unless-stopped
-    environment:
-      ACCEPT_EULA: Y
-      SEQ_FIRSTRUN_ADMINPASSWORD: ${SEQ_ADMIN_PASSWORD}
-    volumes:
-      - comms_seq_data:/data
-
 volumes:
   comms_postgres_data:
-  comms_seq_data:
