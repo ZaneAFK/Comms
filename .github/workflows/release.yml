@@ -76,4 +76,3 @@ jobs:
           files: |
             compose.yml
             nginx.conf
-            .env.template

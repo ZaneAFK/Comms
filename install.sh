@@ -1,7 +1,7 @@
 #!/bin/bash
 # Comms installer.
 #
-# Downloads compose.yml, nginx.conf and .env.template from a GitHub release
+# Downloads compose.yml and nginx.conf from a GitHub release
 # and starts the stack with Docker Compose. Safe to re-run: it reuses an
 # existing .env (secrets included) and just refreshes the version + configs.
 #
@@ -58,7 +58,7 @@ mkdir -p "$INSTALL_DIR" 2>/dev/null || { echo "Error: cannot create $INSTALL_DIR
 cd "$INSTALL_DIR"
 INSTALL_DIR="$(pwd)"
 
-for f in compose.yml nginx.conf .env.template; do
+for f in compose.yml nginx.conf; do
     curl -fsSL "$BASE_URL/$f" -o "$f.new"
     mv "$f.new" "$f"
 done
