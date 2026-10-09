@@ -23,7 +23,7 @@ Use `--dir` to install somewhere other than `/etc/comms`.
 Use `--version` to pull a explicit version of Comms.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ZaneAFK/Comms/master/install.sh | bash -s -- --version 1.2.0 --dir /opt/comms
+curl -fsSL https://raw.githubusercontent.com/ZaneAFK/Comms/master/install.sh | sudo bash -s -- --version 1.2.0 --dir /opt/comms
 ```
 
 > **HTTPS:** The default config serves HTTP only. To add HTTPS, either put your own reverse proxy (Caddy, Traefik, etc.) in front of the stack, or swap in an HTTPS-capable `nginx.conf` with a `certbot` container alongside.

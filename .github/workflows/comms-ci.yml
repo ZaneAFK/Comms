@@ -8,6 +8,9 @@ on:
       - ready_for_review
       - synchronize
 
+permissions:
+  contents: read
+
 jobs:
   frontend:
     name: Frontend CI
@@ -15,10 +18,10 @@ jobs:
     if: github.event_name == 'workflow_call' || github.event.pull_request.draft == false
     steps:
         - name: Checkout repository
-          uses: actions/checkout@v3
+          uses: actions/checkout@v4
 
         - name: Setup Node.js
-          uses: actions/setup-node@v3
+          uses: actions/setup-node@v4
           with:
             node-version: '20'
 
@@ -49,10 +52,10 @@ jobs:
     if: github.event_name == 'workflow_call' || github.event.pull_request.draft == false
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
 
