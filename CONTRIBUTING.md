@@ -66,4 +66,4 @@ Replace `<Migration_Number>` with the next migration number (e.g. `CommsDb_6`).
    - Unit tests
    - Build checks
    - Linting and style checks (where applicable)
-5. Address failing checks and merge once all checks are passed
+5. Address any failing checks. Once all checks pass, a maintainer will review and merge your PR
