@@ -57,11 +57,11 @@ describe('LoginForm', () => {
 		expect(mockAuthStore.login).toHaveBeenCalledWith('alice@example.com', 'Password123!')
 	})
 
-	it('navigates to /messages on successful login', async () => {
+	it('navigates to / on successful login', async () => {
 		const wrapper = mountForm()
 		await wrapper.find('form').trigger('submit')
 		await flushPromises()
-		expect(mockPush).toHaveBeenCalledWith('/messages')
+		expect(mockPush).toHaveBeenCalledWith('/')
 	})
 
 	it('shows an error message on failed login', async () => {

@@ -64,7 +64,7 @@ async function submit() {
 			return
 		}
 
-		router.push('/messages')
+		router.push('/')
 	}
 	finally {
 		loading.value = false
