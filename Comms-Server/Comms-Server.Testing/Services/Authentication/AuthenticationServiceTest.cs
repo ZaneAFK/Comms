@@ -43,7 +43,7 @@ namespace Comms_Server.Testing.Services
 				.Setup(x => x.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
 				.ReturnsAsync(Result<User>.Failure(new[] { "Registration failed" }));
 
-			var failingAuthenticationService = new AuthenticationService(Factory, _provider.GetRequiredService<ILogger<AuthenticationService>>(), mockUserService.Object, _provider.GetRequiredService<IJwtService>());
+			var failingAuthenticationService = new AuthenticationService(_provider.GetRequiredService<ILogger<AuthenticationService>>(), mockUserService.Object, _provider.GetRequiredService<IJwtService>());
 
 			// Act
 			var result = await failingAuthenticationService.RegisterUserAsync("TestUser", "testuser@hotmail.com", "supersecure123!");
@@ -126,7 +126,7 @@ namespace Comms_Server.Testing.Services
 				.Setup(x => x.LoginAsync(It.IsAny<string>(), It.IsAny<string>()))
 				.ReturnsAsync(Result<User>.Failure(new[] { "Service error" }));
 
-			var failingAuthenticationService = new AuthenticationService(Factory, _provider.GetRequiredService<ILogger<AuthenticationService>>(), mockUserService.Object, _provider.GetRequiredService<IJwtService>());
+			var failingAuthenticationService = new AuthenticationService(_provider.GetRequiredService<ILogger<AuthenticationService>>(), mockUserService.Object, _provider.GetRequiredService<IJwtService>());
 
 			// Act
 			var result = await failingAuthenticationService.LoginAsync("testuser@hotmail.com", "supersecure123!");

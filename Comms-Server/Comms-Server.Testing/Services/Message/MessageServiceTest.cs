@@ -2,6 +2,7 @@ using Comms_Server.Database.Models;
 using Comms_Server.DTOs.Conversation;
 using Comms_Server.Services;
 using Comms_Server.Testing.Shared;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
@@ -83,7 +84,7 @@ namespace Comms_Server.Testing.Services
 			var result = await _messageService.CreateMessageAsync(convo.Id, userId, "Persisted!");
 
 			// Assert
-			var exists = await Factory.ExistsAsync<Message>(m => m.Id == result.Id);
+			var exists = await Db.Messages.AnyAsync(m => m.Id == result.Id);
 			Assert.IsTrue(exists, "Message should be persisted to the database.");
 		}
 
@@ -100,8 +101,8 @@ namespace Comms_Server.Testing.Services
 
 			// Assert
 			Assert.AreNotEqual(msg1.Id, msg2.Id, "Each message should receive a unique ID.");
-			Assert.IsTrue(await Factory.ExistsAsync<Message>(m => m.Id == msg1.Id));
-			Assert.IsTrue(await Factory.ExistsAsync<Message>(m => m.Id == msg2.Id));
+			Assert.IsTrue(await Db.Messages.AnyAsync(m => m.Id == msg1.Id));
+			Assert.IsTrue(await Db.Messages.AnyAsync(m => m.Id == msg2.Id));
 		}
 
 		// ── GetMessagesAsync ──────────────────────────────────────────────────────
