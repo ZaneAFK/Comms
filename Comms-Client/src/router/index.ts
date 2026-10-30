@@ -8,10 +8,6 @@ const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
 	routes: [
 		{
-			path: '/',
-			redirect: () => { return '/login' }
-		},
-		{
 			path: '/login',
 			name: 'login',
 			component: Login
@@ -22,7 +18,7 @@ const router = createRouter({
 			component: Register
 		},
 		{
-			path: '/messages',
+			path: '/',
 			name: 'messages',
 			component: Messages,
 			meta: { requiresAuth: true }
@@ -36,7 +32,7 @@ router.beforeEach((to, from, next) => {
 	if (to.meta.requiresAuth && !authStore.isAuthenticated) {
 		next('/login')
 	} else if ((to.path === '/login' || to.path === '/register') && authStore.isAuthenticated) {
-		next('/messages')
+		next('/')
 	} else {
 		next()
 	}
