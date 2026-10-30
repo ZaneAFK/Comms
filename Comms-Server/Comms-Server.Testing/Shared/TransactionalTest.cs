@@ -1,6 +1,6 @@
 ﻿using Comms_Server.Database;
-using Comms_Server.Database.Models;
 using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
@@ -11,21 +11,21 @@ namespace Comms_Server.Testing.Shared
 		private SqliteConnection? _connection = null;
 		protected ServiceProvider _provider = null!;
 
-		public required IFactory Factory;
+		public required CommsDbContext Db;
 
 		[SetUp]
 		public virtual async Task Setup()
 		{
 			(_provider, _connection) = await TestDatabaseFactory.CreateAsync();
 
-			Factory = _provider.GetRequiredService<IFactory>();
+			Db = _provider.GetRequiredService<CommsDbContext>();
 		}
 
 		protected async Task AssertAmountOfUsersSaved(int expectedAmount)
 		{
-			var users = (List<User>)await Factory.GetAllAsync<User>();
-			Assert.AreEqual(expectedAmount, users.Count,
-				$"Expected {expectedAmount} User(s) in the database, but found {users.Count}.");
+			var userCount = await Db.Users.CountAsync();
+			Assert.AreEqual(expectedAmount, userCount,
+				$"Expected {expectedAmount} User(s) in the database, but found {userCount}.");
 		}
 
 		public void Dispose()

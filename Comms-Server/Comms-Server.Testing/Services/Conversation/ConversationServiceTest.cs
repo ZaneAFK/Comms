@@ -1,6 +1,6 @@
-using Comms_Server.Database.Models;
 using Comms_Server.Services;
 using Comms_Server.Testing.Shared;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
@@ -204,7 +204,7 @@ namespace Comms_Server.Testing.Services
 
 			// Assert
 			Assert.IsNotNull(result);
-			var exists = await Factory.ExistsAsync<Conversation>(c => c.Id == result!.Id);
+			var exists = await Db.Conversations.AnyAsync(c => c.Id == result!.Id);
 			Assert.IsTrue(exists, "Conversation should be persisted to the database.");
 		}
 
@@ -219,7 +219,7 @@ namespace Comms_Server.Testing.Services
 
 			// Assert
 			Assert.IsNotNull(result);
-			var memberExists = await Factory.ExistsAsync<ConversationMember>(
+			var memberExists = await Db.ConversationMembers.AnyAsync(
 				cm => cm.ConversationId == result!.Id && cm.UserId == userId);
 			Assert.IsTrue(memberExists, "ConversationMember record should be persisted to the database.");
 		}

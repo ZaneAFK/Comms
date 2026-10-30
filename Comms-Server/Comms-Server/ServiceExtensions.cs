@@ -24,9 +24,6 @@ namespace Comms_Server
 
 		public static IServiceCollection AddCommsServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment? environment = null)
 		{
-			// Core database service
-			services.AddScoped<IFactory, Factory>();
-
 			// Identity services
 			services.AddIdentity<User, IdentityRole<Guid>>(options =>
 			{
