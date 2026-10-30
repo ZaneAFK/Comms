@@ -5,12 +5,12 @@
 # and starts the stack with Docker Compose. Safe to re-run: it reuses an
 # existing .env (secrets included) and just refreshes the version + configs.
 #
-# Installs to /etc/comms by default (requires root/sudo). Use --dir to install
+# Installs to /opt/comms by default (requires root/sudo). Use --dir to install
 # elsewhere without elevated privileges.
 #
 # Usage:
 #   curl -fsSL https://raw.githubusercontent.com/ZaneAFK/Comms/master/install.sh | sudo bash
-#   curl -fsSL https://raw.githubusercontent.com/ZaneAFK/Comms/master/install.sh | sudo bash -s -- --version 1.2.0 --dir /opt/comms
+#   curl -fsSL https://raw.githubusercontent.com/ZaneAFK/Comms/master/install.sh | sudo bash -s -- --version 1.2.0 --dir /srv/comms
 
 set -euo pipefail
 
@@ -33,9 +33,9 @@ main() {
 EOF
 
     REPO="ZaneAFK/Comms"
-    INSTALL_DIR="/etc/comms"
+    INSTALL_DIR="/opt/comms"
     VERSION=""
-
+    
     while [ $# -gt 0 ]; do
         case "$1" in
             --version) VERSION="$2"; shift 2 ;;
