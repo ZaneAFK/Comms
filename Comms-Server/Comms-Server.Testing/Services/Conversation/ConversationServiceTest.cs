@@ -1,4 +1,3 @@
-using Comms_Server.Database.Models;
 using Comms_Server.Services;
 using Comms_Server.Testing.Shared;
 using Microsoft.EntityFrameworkCore;
